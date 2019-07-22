@@ -1,0 +1,84 @@
+{
+  "rules": {
+    "extends": "react-app",
+    "interface-name": [
+      true,
+      "never-prefix"
+    ],
+    "array-type": [
+      true,
+      "array-simple"
+    ],
+    "trailing-comma": false,
+    "class-name": true,
+    "comment-format": [
+      true,
+      "check-space"
+    ],
+    "curly": true,
+    "eofline": true,
+    "forin": true,
+    "indent": [
+      true,
+      "spaces"
+    ],
+    "jsdoc-format": true,
+    "label-position": true,
+    "new-parens": true,
+    "no-trailing-whitespace": true,
+    "no-angle-bracket-type-assertion": true,
+    "no-conditional-assignment": true,
+    "no-construct": true,
+    "no-debugger": true,
+    "no-namespace": [
+      true,
+      "allow-declarations"
+    ],
+    "no-reference": true,
+    "no-require-imports": true,
+    "no-unused-expression": true,
+    "no-use-before-declare": false,
+    "no-var-keyword": true,
+    "jsx-tag-spacing": true,
+    "one-variable-per-declaration": [
+      true,
+      "ignore-for-loop"
+    ],
+    "object-literal-shorthand": true,
+    "ordered-imports": false,
+    "radix": true,
+    "semicolon": [
+      true,
+      "always",
+      "ignore-bound-class-methods"
+    ],
+    "switch-default": true,
+    "triple-equals": [
+      true,
+      "allow-null-check"
+    ],
+    "use-isnan": true,
+    "variable-name": [
+      true,
+      "check-format",
+      "ban-keywords",
+      "allow-leading-underscore",
+      "allow-pascal-case"
+    ],
+    "whitespace": [
+      true,
+      "check-module"
+    ],
+    "quotemark": [
+      true,
+      "single",
+      "jsx-double"
+    ]
+  },
+  "linterOptions": {
+    "exclude": [
+      "config/**/*.js",
+      "node_modules/**/*.ts"
+    ]
+  }
+}
