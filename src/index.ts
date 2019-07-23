@@ -6,20 +6,20 @@ import { PORT } from './utils/constants';
 
 debug('ts-express:server');
 
-Server.set('port', PORT);
-
-console.log(`Server listening on port ${PORT}`);
+const port = process.env.PORT || PORT;
+Server.set('port', port);
 
 const server = http.createServer(Server);
-server.listen(PORT);
+server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
+console.log(`Server listening on port ${port}...`);
 
 function onError(error: NodeJS.ErrnoException): void {
   if (error.syscall !== 'listen') {
     throw error;
   }
-  const bind = typeof PORT === 'string' ? 'Pipe ' + PORT : 'Port ' + PORT;
+  const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
   switch (error.code) {
     case 'EACCES':
       console.error(`${bind} requires elevated privileges`);
