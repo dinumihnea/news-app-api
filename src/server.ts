@@ -10,6 +10,7 @@ import * as config from 'config';
 import { ALLOW_ORIGIN, MONGO_DB_URL } from './utils/constants';
 import TagsRouter from './tags/TagsRouter';
 import NewsRouter from './news/NewsRouter';
+import BookmarksRouter from './bookmarks/BookmarksRouter';
 
 class Server {
   public app: express.Application;
@@ -59,6 +60,7 @@ class Server {
     this.app.use(`/${config.get('prefix')}/${config.get('version')}/`, router);
     this.app.use(`/${config.get('prefix')}/${config.get('version')}/news`, NewsRouter);
     this.app.use(`/${config.get('prefix')}/${config.get('version')}/tags`, TagsRouter);
+    this.app.use(`/${config.get('prefix')}/${config.get('version')}/bookmarks`, BookmarksRouter);
   }
 }
 
