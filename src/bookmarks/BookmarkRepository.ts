@@ -1,47 +1,62 @@
-import { Request, Response } from 'express';
-import { Repository } from '../repositories/Repository';
 import { Bookmark, BookmarkModel } from './Bookmark';
+import { StoredCollection } from '../repositories/StoredCollection';
 
-export default class BookmarkRepository implements Repository<BookmarkModel> {
+export default class BookmarkRepository implements StoredCollection<BookmarkModel> {
 
   constructor() {
-    this.create = this.create.bind(this);
+    this.save = this.save.bind(this);
   }
 
-  create(req: Request, res: Response): void {
-    const bookmark = new Bookmark(req.body);
-
-    if (this.isValid(bookmark)) {
-      bookmark.save()
-        .then((data: BookmarkModel) =>
-          res.status(201).json({ data }))
-        .catch(error => res.status(500).json({ error }));
-    } else {
-      res.status(400).json({ error: 'Invalid bookmark.' });
+  async save(category: BookmarkModel): Promise<BookmarkModel> {
+    try {
+      return await category.save();
+    } catch (e) {
+      throw new Error(e);
     }
   }
 
-  delete(req: Request, res: Response): void {
+  async findAll(limit: number, offset: number): Promise<Array<BookmarkModel>> {
+    try {
+      return await Bookmark.find()
+        .sort({ creationDate: -1 })
+        .skip(offset)
+        .limit(limit)
+        .populate('news', '-body');
+    } catch (e) {
+      throw new Error(e);
+    }
   }
 
-  findAll(req: Request, res: Response): void {
-    // TODO implement limit/offset logic
-    Bookmark.find({})
-      .sort({ creationDate: -1 })
-      .then((data: Array<BookmarkModel>) => res.status(200).json(data))
-      .catch((error: Error) => {
-        console.error('Error happened during find.', error);
-        res.status(500).json(error);
-      });
+  async findById(_id: String): Promise<BookmarkModel> {
+    try {
+      return await Bookmark.findById(_id);
+    } catch (e) {
+      throw new Error(e);
+    }
   }
 
-  findOne(req: Request, res: Response): void {
+  async findOne(key: String): Promise<BookmarkModel> {
+    try {
+      return await Bookmark.findOne({ key });
+    } catch (e) {
+      throw new Error(e);
+    }
   }
 
-  isValid(model: BookmarkModel): boolean {
-    return !!(model && model.newsId && model.userId);
+  async update(model: BookmarkModel): Promise<any> {
+    try {
+      return await model.updateOne({ $set: { model } });
+    } catch (e) {
+      throw new Error(e);
+    }
   }
 
-  update(req: Request, res: Response): void {
+  async delete(key: String): Promise<any> {
+    try {
+      return await Bookmark.deleteOne({ key: key });
+    } catch (e) {
+      throw new Error(e);
+    }
   }
+
 }

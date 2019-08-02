@@ -2,19 +2,26 @@ import * as mongoose from 'mongoose';
 import { Model, model, Schema } from 'mongoose';
 
 export interface TagModel extends mongoose.Document {
-  name: String;
+  key: String;
   createdAt: Date;
+  count?: Number
 }
 
 const TagSchema: Schema = new Schema({
-  name: {
+  key: {
     type: String,
-    required: true
+    required: true,
+    unique: true
   },
   createdAt: {
     type: Date,
     required: true,
-    default: new Date()
+    default: Date.now
+  },
+  count: {
+    type: Number,
+    required: true,
+    default: 0
   }
 });
 

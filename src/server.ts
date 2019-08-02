@@ -11,6 +11,7 @@ import { ALLOW_ORIGIN, MONGO_DB_URL } from './utils/constants';
 import TagsRouter from './tags/TagsRouter';
 import NewsRouter from './news/NewsRouter';
 import BookmarksRouter from './bookmarks/BookmarksRouter';
+import CategoryRouter from './categories/CategoryRouter';
 
 class Server {
   public app: express.Application;
@@ -34,6 +35,9 @@ class Server {
     this.app.use(compression());
     this.app.use(helmet());
     this.app.use(cors());
+
+    // Make images public resources
+    this.app.use(express.static('public'));
 
     if (this.app.get('env') === 'development') {
       this.app.use(logger('dev'));
@@ -61,6 +65,7 @@ class Server {
     this.app.use(`/${config.get('prefix')}/${config.get('version')}/news`, NewsRouter);
     this.app.use(`/${config.get('prefix')}/${config.get('version')}/tags`, TagsRouter);
     this.app.use(`/${config.get('prefix')}/${config.get('version')}/bookmarks`, BookmarksRouter);
+    this.app.use(`/${config.get('prefix')}/${config.get('version')}/categories`, CategoryRouter);
   }
 }
 
