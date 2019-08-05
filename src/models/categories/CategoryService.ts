@@ -1,7 +1,7 @@
 import { Category, CategoryModel } from './Category';
-import { StoredCollection } from '../repositories/StoredCollection';
+import CategoryRepository from './CategoryRepository';
 
-export default class CategoryRepository implements StoredCollection<CategoryModel> {
+export default class CategoryService implements CategoryRepository {
 
   constructor() {
     this.save = this.save.bind(this);
@@ -42,8 +42,12 @@ export default class CategoryRepository implements StoredCollection<CategoryMode
   }
 
   async update(model: CategoryModel): Promise<any> {
+    let category = await this.findOne(model.key);
+    if (!category) {
+      throw new Error('Category with given key does not exists');
+    }
     try {
-      return await model.updateOne({
+      return await category.updateOne({
         $set: {
           key: model.key,
           en: model.en,

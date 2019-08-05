@@ -1,7 +1,7 @@
 /**
  * I18n variants
  */
-export type Languages =
+export type Language =
 // English
   'en' |
   // Romanian

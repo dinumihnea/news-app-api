@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose';
 import { model, Model, Schema } from 'mongoose';
-import { CategoryModel } from '../categories/Category';
+import { CategoryModel } from '../models/categories/Category';
 
 export interface NewsModel extends mongoose.Document {
   category: CategoryModel,

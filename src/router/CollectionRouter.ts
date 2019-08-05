@@ -9,41 +9,34 @@ export interface CollectionRouter<Model> {
    * @param req given Request which wrap appropriate data in the body
    * @param res returned Response
    */
-  create(req: Request, res: Response): void
+  create(req: Request, res: Response): Promise<void>
 
   /**
    * Gets all records from collection
    * @param req given Request which wrap appropriate data into body field
    * @param res returned Response
    */
-  findAll(req: Request, res: Response): void
+  findAll(req: Request, res: Response): Promise<void>
 
   /**
    * Gets a copy of specific object based on given identifier
    * @param req given Request with an identifier in the body
    * @param res returned Response
    */
-  findOne(req: Request, res: Response): void
+  findOne(req: Request, res: Response): Promise<void>
 
   /**
    * Updates a record in DB based on given identifier
    * @param req given Request with an identifier in the body
    * @param res returned Response
    */
-  update(req: Request, res: Response): void
+  update(req: Request, res: Response): Promise<void>
 
   /**
    * Delete a record of specific model from DB
    * @param req given Request which wrap an identifier in the body
    * @param res returned Response
    */
-  delete(req: Request, res: Response): void
-
-  /**
-   * Checks if the given model is valid to be saved in DB
-   * Should be used for general validation
-   * @param model The Model to be checked
-   */
-  isValid(model: Model): boolean;
+  delete(req: Request, res: Response): Promise<void>
 
 }

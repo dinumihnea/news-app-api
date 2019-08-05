@@ -1,20 +1,19 @@
 import { Request, Response, Router } from 'express';
 import NewsRepository from './NewsRepository';
-import { CollectionRouter } from '../repositories/CollectionRouter';
+import { CollectionRouter } from '../router/CollectionRouter';
 import { News, NewsModel } from './News';
-import CategoryRepository from '../categories/CategoryRepository';
-import { CategoryModel } from '../categories/Category';
+import CategoryRepository from '../models/categories/CategoryRepository';
+import { CategoryModel } from '../models/categories/Category';
 import * as mongoose from 'mongoose';
-import TagRepository from '../tags/TagRepository';
 import { TagModel } from '../tags/Tag';
+import TagService from '../tags/TagService';
 
-// TODO separate logic between Router and Service which will implement the Repository
 class NewsRouter implements CollectionRouter<NewsModel> {
 
   public static PAGE_SIZE = 48;
   public router: Router = Router();
   private categoryRepository: CategoryRepository = new CategoryRepository();
-  private tagRepository: TagRepository = new TagRepository();
+  private tagService: TagService = new TagService();
   private repository: NewsRepository = new NewsRepository();
 
   constructor() {
@@ -158,14 +157,14 @@ class NewsRouter implements CollectionRouter<NewsModel> {
 
   async findTag(key: String): Promise<TagModel> {
     try {
-      return await this.tagRepository.findOne(key);
+      return await this.tagService.findOne(key);
     } catch (error) {
       throw new Error(error);
     }
   }
 
-  delete(req: Request, res: Response): void {
-  }
+  delete = async (req: Request, res: Response): Promise<void> => {
+  };
 
   findAll(req: Request, res: Response): void {
     const offset = req.body.offset ? req.body.limit : 0;

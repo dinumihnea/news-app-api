@@ -1,7 +1,7 @@
 import { Tag, TagModel } from './Tag';
-import { StoredCollection } from '../repositories/StoredCollection';
+import { Repository } from '../repositories/Repository';
 
-export default class TagRepository implements StoredCollection<TagModel> {
+export default class TagService implements Repository<TagModel> {
 
   constructor() {
     this.save = this.save.bind(this);

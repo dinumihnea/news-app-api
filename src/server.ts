@@ -8,10 +8,8 @@ import * as mongoose from 'mongoose';
 import * as logger from 'morgan';
 import * as config from 'config';
 import { ALLOW_ORIGIN, MONGO_DB_URL } from './utils/constants';
-import TagsRouter from './tags/TagsRouter';
-import NewsRouter from './news/NewsRouter';
-import BookmarksRouter from './bookmarks/BookmarksRouter';
-import CategoryRouter from './categories/CategoryRouter';
+import CategoryRouter from './models/categories';
+import BookmarksRouter from './models/users';
 
 class Server {
   public app: express.Application;
@@ -23,13 +21,13 @@ class Server {
   }
 
   public config(): void {
-    mongoose.connect(MONGO_DB_URL || process.env.MONGODB_URI, {useNewUrlParser: true})
+    mongoose.connect(MONGO_DB_URL || process.env.MONGODB_URI, { useNewUrlParser: true })
       .then(() => console.log('Successfully connected to MongoDB.'))
       .catch(error => console.error('Error during MongoDB connection:', error));
 
     console.log(`${config.get('name')} is running in ${this.app.get('env')} environment.`);
 
-    this.app.use(bodyParser.urlencoded({extended: true}));
+    this.app.use(bodyParser.urlencoded({ extended: true }));
     this.app.use(bodyParser.json());
     this.app.use(cookieParser());
     this.app.use(compression());
@@ -62,9 +60,9 @@ class Server {
     const router: express.Router = express.Router();
 
     this.app.use(`/${config.get('prefix')}/${config.get('version')}/`, router);
-    this.app.use(`/${config.get('prefix')}/${config.get('version')}/news`, NewsRouter);
-    this.app.use(`/${config.get('prefix')}/${config.get('version')}/tags`, TagsRouter);
-    this.app.use(`/${config.get('prefix')}/${config.get('version')}/bookmarks`, BookmarksRouter);
+    // this.app.use(`/${config.get('prefix')}/${config.get('version')}/news`, NewsRouter);
+    // this.app.use(`/${config.get('prefix')}/${config.get('version')}/tags`, TagsRouter);
+    this.app.use(`/${config.get('prefix')}/${config.get('version')}/users`, BookmarksRouter);
     this.app.use(`/${config.get('prefix')}/${config.get('version')}/categories`, CategoryRouter);
   }
 }

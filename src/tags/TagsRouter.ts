@@ -1,14 +1,14 @@
 import { Request, Response, Router } from 'express';
 import { Tag, TagModel } from './Tag';
-import TagRepository from './TagRepository';
-import { CollectionRouter } from '../repositories/CollectionRouter';
+import { CollectionRouter } from '../router/CollectionRouter';
 import * as mongoose from 'mongoose';
+import TagService from './TagService';
 
 class TagsRouter implements CollectionRouter<TagModel> {
 
   public static PAGE_SIZE = 12;
   public router: Router = Router();
-  private repository: TagRepository = new TagRepository;
+  private service: TagService = new TagService;
 
   constructor() {
     this.create = this.create.bind(this);
@@ -21,9 +21,9 @@ class TagsRouter implements CollectionRouter<TagModel> {
     this.router.get('/', this.findAll);
     this.router.post('/', this.create);
     this.router.get('/:id', this.findOne);
-    // this.router.post('/', this.repository.create);
-    // this.router.put('/:name', this.repository.update);
-    // this.router.delete('/:name', this.repository.delete);
+    // this.router.post('/', this.service.create);
+    // this.router.put('/:name', this.service.update);
+    // this.router.delete('/:name', this.service.delete);
   }
 
   create(req: Request, res: Response): void {
@@ -31,7 +31,7 @@ class TagsRouter implements CollectionRouter<TagModel> {
     const tag = new Tag({ key });
     if (this.isValid(tag as TagModel)) {
 
-      this.repository.save(tag)
+      this.service.save(tag)
         .then((data: TagModel) =>
           res.status(201).json({ data }))
         .catch((error: Error) => {
@@ -47,7 +47,7 @@ class TagsRouter implements CollectionRouter<TagModel> {
   findAll(req: Request, res: Response): void {
     const offset = req.body.offset ? req.body.limit : 0;
     const limit = req.body.limit ? req.body.limit : TagsRouter.PAGE_SIZE;
-    this.repository.findAll(limit, offset)
+    this.service.findAll(limit, offset)
       .then((data: Array<TagModel>) =>
         res.status(200).json(data))
       .catch((error: Error) => {
@@ -65,7 +65,7 @@ class TagsRouter implements CollectionRouter<TagModel> {
     // Check if the param is an ObjectId or a key
     if (mongoose.Types.ObjectId.isValid(id)) {
 
-      this.repository.findById(id)
+      this.service.findById(id)
         .then((data: TagModel) =>
           res.status(200).json(data))
         .catch((error: Error) => {
@@ -75,7 +75,7 @@ class TagsRouter implements CollectionRouter<TagModel> {
 
     } else {
 
-      this.repository.findOne(id)
+      this.service.findOne(id)
         .then((data: TagModel) =>
           res.status(200).json(data))
         .catch((error: Error) => {

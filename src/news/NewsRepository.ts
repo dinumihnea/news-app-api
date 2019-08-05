@@ -1,7 +1,7 @@
 import { News, NewsModel } from './News';
-import { StoredCollection } from '../repositories/StoredCollection';
+import { Repository } from '../repositories/Repository';
 
-export default class NewsRepository implements StoredCollection<NewsModel> {
+export default class NewsRepository implements Repository<NewsModel> {
 
   constructor() {
     this.save = this.save.bind(this);

@@ -1,49 +1,48 @@
-import { Request, Response } from 'express';
-
 /**
- * Abstract representation of models stored into database
+ * Represents main database operations for given Model type
  */
 export interface Repository<Model> {
-  /**
-   * Create a copy of specific model and save it into DB
-   * @param req given Request which wrap appropriate data in the body
-   * @param res returned Response
-   */
-  create(req: Request, res: Response): void
 
   /**
-   * Updates a record in DB based on given identifier
-   * @param req given Request with an identifier in the body
-   * @param res returned Response
+   * Save a copy of given model into database
+   *
+   * If the validation of model schema will not pass
+   * an error will be thrown
+   *
+   * @return saved object as Promise data
    */
-  update(req: Request, res: Response): void
+  save(model: Model): Promise<Model>;
 
   /**
-   * Delete a record of specific model from DB
-   * @param req given Request which wrap an identifier in the body
-   * @param res returned Response
+   * Gets all models from database
+   * @param limit - the max number of items
+   * @param offset - the start point of pagination
+   * @return an array with all models
    */
-  delete(req: Request, res: Response): void
+  findAll(limit: number, offset: number): Promise<Array<Model>>;
 
   /**
-   * Gets all records from collection
-   * TODO describe limit/offset logic
-   * @param req given Request which wrap appropriate data into body field
-   * @param res returned Response
+   * Gets one model by given id.
+   * @param _id - the database id of the Model
    */
-  findAll(req: Request, res: Response): void
+  findById(_id: String): Promise<Model>;
 
   /**
-   * Gets a copy of specific object based on given identifier
-   * @param req given Request with an identifier in the body
-   * @param res returned Response
+   * Gets one model by given key.
+   * @param key must be an unique field of Model
    */
-  findOne(req: Request, res: Response): void
+  findOne(key: String): Promise<Model>;
 
   /**
-   * Checks if the given model is valid to be saved in DB
-   * Should be used for general validation
-   * @param model The Model to be checked
+   * Updates the model in database
+   * @param model - the model to be updated
    */
-  isValid(model: Model): boolean
+  update(model: Model): Promise<any>;
+
+  /**
+   * Removes the model from database
+   * @param key can be _id, slug or other unique value
+   */
+  delete(key: String): Promise<any>;
+
 }
