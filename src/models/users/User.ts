@@ -44,6 +44,4 @@ const UserSchema: Schema = new Schema(
   }
 );
 
-UserSchema.index({ news: 1, user: 1 }, { unique: true });
-
 export const User: Model<UserModel> = model('User', UserSchema);

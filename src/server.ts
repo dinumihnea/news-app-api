@@ -9,7 +9,8 @@ import * as logger from 'morgan';
 import * as config from 'config';
 import { ALLOW_ORIGIN, MONGO_DB_URL } from './utils/constants';
 import CategoryRouter from './models/categories';
-import BookmarksRouter from './models/users';
+import TagRouter from './models/tags';
+import UserRouter from './models/users';
 
 class Server {
   public app: express.Application;
@@ -61,8 +62,8 @@ class Server {
 
     this.app.use(`/${config.get('prefix')}/${config.get('version')}/`, router);
     // this.app.use(`/${config.get('prefix')}/${config.get('version')}/news`, NewsRouter);
-    // this.app.use(`/${config.get('prefix')}/${config.get('version')}/tags`, TagsRouter);
-    this.app.use(`/${config.get('prefix')}/${config.get('version')}/users`, BookmarksRouter);
+    this.app.use(`/${config.get('prefix')}/${config.get('version')}/tags`, TagRouter);
+    this.app.use(`/${config.get('prefix')}/${config.get('version')}/users`, UserRouter);
     this.app.use(`/${config.get('prefix')}/${config.get('version')}/categories`, CategoryRouter);
   }
 }
