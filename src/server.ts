@@ -11,6 +11,7 @@ import { ALLOW_ORIGIN, MONGO_DB_URL } from './utils/constants';
 import CategoryRouter from './models/categories';
 import TagRouter from './models/tags';
 import UserRouter from './models/users';
+import NewsRouter from './models/news';
 
 class Server {
   public app: express.Application;
@@ -61,7 +62,7 @@ class Server {
     const router: express.Router = express.Router();
 
     this.app.use(`/${config.get('prefix')}/${config.get('version')}/`, router);
-    // this.app.use(`/${config.get('prefix')}/${config.get('version')}/news`, NewsRouter);
+    this.app.use(`/${config.get('prefix')}/${config.get('version')}/news`, NewsRouter);
     this.app.use(`/${config.get('prefix')}/${config.get('version')}/tags`, TagRouter);
     this.app.use(`/${config.get('prefix')}/${config.get('version')}/users`, UserRouter);
     this.app.use(`/${config.get('prefix')}/${config.get('version')}/categories`, CategoryRouter);

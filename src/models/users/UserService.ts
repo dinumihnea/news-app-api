@@ -1,11 +1,11 @@
 import { User, UserModel } from './User';
 import UserRepository from './UserRepository';
-import { NewsModel } from '../../news/News';
-import NewsRepository from '../../news/NewsRepository';
+import { NewsModel } from '../news/News';
+import NewsService from '../news/NewsService';
 
 export default class UserService implements UserRepository {
 
-  private newsRepository: NewsRepository = new NewsRepository();
+  private newsService: NewsService = new NewsService();
 
   constructor() {
     this.save = this.save.bind(this);
@@ -14,7 +14,7 @@ export default class UserService implements UserRepository {
   async checkNews(newsId: String): Promise<NewsModel> {
     try {
       // TODO use this when bookmark functionality wll be implemented
-      return await this.newsRepository.findById(newsId);
+      return await this.newsService.findById(newsId);
     } catch (e) {
       throw new Error(e);
     }

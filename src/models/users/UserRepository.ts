@@ -1,6 +1,6 @@
 import { UserModel } from './User';
 import { Repository } from '../../repositories/Repository';
-import { NewsModel } from '../../news/News';
+import { NewsModel } from '../news/News';
 
 export default interface UserRepository extends Repository<UserModel> {
 
