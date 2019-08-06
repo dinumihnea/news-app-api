@@ -55,8 +55,9 @@ class UserRouter implements CollectionRouter<UserModel>, ValidationProvider<User
   };
 
   findAll = async (req: Request, res: Response): Promise<void> => {
-    const offset = req.body.offset ? req.body.limit : 0;
-    const limit = req.body.limit ? req.body.limit : UserRouter.PAGE_SIZE;
+    const offset = req.query.offset ? parseInt(req.query.offset) : 0;
+    const limit = req.query.limit ? parseInt(req.query.limit) : UserRouter.PAGE_SIZE;
+
     try {
       const users = await this.service.findAll(limit, offset);
       res.status(200).json(users);

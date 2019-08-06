@@ -41,8 +41,8 @@ class TagRouter implements CollectionRouter<TagModel>, ValidationProvider<TagMod
   };
 
   findAll = async (req: Request, res: Response): Promise<void> => {
-    const offset = req.body.offset ? req.body.limit : 0;
-    const limit = req.body.limit ? req.body.limit : TagRouter.PAGE_SIZE;
+    const offset = req.query.offset ? parseInt(req.query.offset) : 0;
+    const limit = req.query.limit ? parseInt(req.query.limit) : TagRouter.PAGE_SIZE;
 
     try {
       const tags = await this.service.findAll(limit, offset);

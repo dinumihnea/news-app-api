@@ -14,6 +14,16 @@ class NewsRouter implements CollectionRouter<NewsModel>, ValidationProvider<News
     this.routes();
   }
 
+  private routes(): void {
+    this.router.get('/', this.findAll);
+    this.router.get('/categories/:category', this.findByCategory);
+    this.router.get('/tags/:tag', this.findByTagIn);
+    this.router.get('/:id', this.findOne);
+    this.router.post('/', this.create);
+    this.router.put('/', this.update);
+    this.router.delete('/:id', this.delete);
+  }
+
   create = async (req: Request, res: Response): Promise<void> => {
     const draftNews = req.body;
     if (!this.isValid(draftNews as NewsModel)) {
@@ -32,8 +42,8 @@ class NewsRouter implements CollectionRouter<NewsModel>, ValidationProvider<News
 
   findByCategory = async (req: Request, res: Response): Promise<void> => {
     const categoryKey = req.params.category;
-    const offset = req.body.offset ? req.body.limit : 0;
-    const limit = req.body.limit ? req.body.limit : NewsRouter.PAGE_SIZE;
+    const offset = req.query.offset ? parseInt(req.query.offset) : 0;
+    const limit = req.query.limit ? parseInt(req.query.limit) : NewsRouter.PAGE_SIZE;
     // const lang = req.headers['content-language'];
     if (!categoryKey) {
       res.status(400).json({ error: 'Request does not contains any category key' });
@@ -50,8 +60,8 @@ class NewsRouter implements CollectionRouter<NewsModel>, ValidationProvider<News
   };
 
   findByTagIn = async (req: Request, res: Response): Promise<void> => {
-    const offset = req.body.offset ? req.body.limit : 0;
-    const limit = req.body.limit ? req.body.limit : NewsRouter.PAGE_SIZE;
+    const offset = req.query.offset ? parseInt(req.query.offset) : 0;
+    const limit = req.query.limit ? parseInt(req.query.limit) : NewsRouter.PAGE_SIZE;
     const tagKey = req.params.tag;
     // const lang = req.headers['content-language'];
     if (!tagKey) {
@@ -85,8 +95,8 @@ class NewsRouter implements CollectionRouter<NewsModel>, ValidationProvider<News
   };
 
   findAll = async (req: Request, res: Response): Promise<void> => {
-    const offset = req.body.offset ? req.body.limit : 0;
-    const limit = req.body.limit ? req.body.limit : NewsRouter.PAGE_SIZE;
+    const offset = req.query.offset ? parseInt(req.query.offset) : 0;
+    const limit = req.query.limit ? parseInt(req.query.limit) : NewsRouter.PAGE_SIZE;
     // const lang = req.headers['content-language'];
 
     try {
@@ -130,17 +140,7 @@ class NewsRouter implements CollectionRouter<NewsModel>, ValidationProvider<News
   };
 
   isValid(model: NewsModel): boolean {
-    return !!(model && model.category && model.category.key && model.slug && model.title && model.author && model.body);
-  }
-
-  private routes(): void {
-    this.router.get('/', this.findAll);
-    this.router.get('/categories/:category', this.findByCategory);
-    this.router.get('/tags/:tag', this.findByTagIn);
-    this.router.get('/:id', this.findOne);
-    this.router.post('/', this.create);
-    this.router.put('/', this.update);
-    this.router.delete('/:id', this.delete);
+    return !!(model && model.category && model.category.key && model.title && model.author && model.body);
   }
 
 }
