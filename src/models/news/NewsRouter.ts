@@ -4,7 +4,7 @@ import { News, NewsModel } from './News';
 import NewsService from './NewsService';
 import ValidationProvider from '../../repositories/ValidationProvider';
 
-class NewsRouter implements CollectionRouter<NewsModel>, ValidationProvider<NewsModel> {
+export class NewsRouter implements CollectionRouter<NewsModel>, ValidationProvider<NewsModel> {
 
   public static PAGE_SIZE = 48;
   public router: Router = Router();

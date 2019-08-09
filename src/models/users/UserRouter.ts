@@ -3,8 +3,9 @@ import { CollectionRouter } from '../../router/CollectionRouter';
 import { User, UserModel } from './User';
 import UserService from './UserService';
 import ValidationProvider from '../../repositories/ValidationProvider';
+import Helpers from '../../utils/Helpers';
 
-class UserRouter implements CollectionRouter<UserModel>, ValidationProvider<UserModel> {
+export class UserRouter implements CollectionRouter<UserModel>, ValidationProvider<UserModel> {
 
   public static PAGE_SIZE = 48;
   public router: Router = Router();
@@ -104,7 +105,7 @@ class UserRouter implements CollectionRouter<UserModel>, ValidationProvider<User
   };
 
   isValid(model: UserModel): boolean {
-    return !!(model && model.username && model.email);
+    return !!(model && model.username && Helpers.isValidEmail(model.email) && model.password);
   }
 
 }

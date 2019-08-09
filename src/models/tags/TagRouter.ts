@@ -5,7 +5,7 @@ import * as mongoose from 'mongoose';
 import TagService from './TagService';
 import ValidationProvider from '../../repositories/ValidationProvider';
 
-class TagRouter implements CollectionRouter<TagModel>, ValidationProvider<TagModel> {
+export class TagRouter implements CollectionRouter<TagModel>, ValidationProvider<TagModel> {
 
   public static PAGE_SIZE = 12;
   public router: Router = Router();

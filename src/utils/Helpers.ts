@@ -2,6 +2,7 @@
  * A set of global utils
  */
 export default class Helpers {
+  public static EMAIL_REGEX = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
 
   /**
    * Creates a slug from given value
@@ -20,5 +21,13 @@ export default class Helpers {
       .replace(/--+/g, '-') // Replace multiple - with single -
       .replace(/^-+/, '') // Trim - from start of text
       .replace(/-+$/, ''); // Trim - from end of text
+  }
+
+  /**
+   * Checks if the given value is a valid email address
+   * @param value - the value to be checked
+   */
+  public static isValidEmail(value: String): boolean {
+    return Helpers.EMAIL_REGEX.test(String(value).toLowerCase());
   }
 }

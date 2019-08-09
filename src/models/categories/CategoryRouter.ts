@@ -6,7 +6,7 @@ import { I18n, Language } from '../../i18n/I18n';
 import CategoryService from './CategoryService';
 import ValidationProvider from '../../repositories/ValidationProvider';
 
-class CategoryRouter implements CollectionRouter<CategoryModel>, I18n<CategoryModel>, ValidationProvider<CategoryModel> {
+export class CategoryRouter implements CollectionRouter<CategoryModel>, I18n<CategoryModel>, ValidationProvider<CategoryModel> {
 
   public router: Router = Router();
   private service: CategoryService = new CategoryService();

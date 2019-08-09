@@ -4,9 +4,10 @@ import { Model, model, Schema } from 'mongoose';
 export interface UserModel extends mongoose.Document {
   username: String;
   email: String;
+  password: String,
   firstName?: String;
   lastName?: String;
-  bookmarks?: Array<any>
+  bookmarks?: Array<any>;
   createdAt?: Date;
 }
 
@@ -20,7 +21,12 @@ const UserSchema: Schema = new Schema(
     email: {
       type: String,
       required: true,
-      unique: true
+      unique: true,
+      maxlength: 255
+    },
+    password: {
+      type: String,
+      required: true
     },
     firstName: {
       type: String,
