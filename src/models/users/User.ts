@@ -2,9 +2,8 @@ import * as mongoose from 'mongoose';
 import { Model, model, Schema } from 'mongoose';
 
 export interface UserModel extends mongoose.Document {
-  username: String;
   email: String;
-  password: String,
+  password?: String,
   firstName?: String;
   lastName?: String;
   bookmarks?: Array<any>;
@@ -13,28 +12,28 @@ export interface UserModel extends mongoose.Document {
 
 const UserSchema: Schema = new Schema(
   {
-    username: {
-      type: String,
-      required: true,
-      unique: true
-    },
     email: {
       type: String,
       required: true,
       unique: true,
+      minlength: 5,
       maxlength: 255
     },
     password: {
       type: String,
-      required: true
+      required: true,
+      minlength: 8,
+      maxlength: 255
     },
     firstName: {
       type: String,
-      required: false
+      required: false,
+      maxlength: 255
     },
     lastName: {
       type: String,
-      required: false
+      required: false,
+      maxlength: 255
     },
     bookmarks: {
       type: Array,

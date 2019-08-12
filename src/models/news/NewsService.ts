@@ -72,8 +72,6 @@ export default class NewsService implements NewsRepository {
 
   update = async (model: NewsModel): Promise<any> => {
     let news = await this.findById(model._id);
-    console.log('Old news', news);
-    console.log('New news', model);
     if (!news) {
       throw new Error('News with given identifiers does not exists');
     }

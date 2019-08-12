@@ -1,6 +1,6 @@
 import { User, UserModel } from './User';
 import UserRepository from './UserRepository';
-import { NewsModel } from '../news/News';
+import { NewsModel } from '../news';
 import NewsService from '../news/NewsService';
 
 export default class UserService implements UserRepository {
@@ -47,9 +47,9 @@ export default class UserService implements UserRepository {
     }
   }
 
-  async findOne(username: String): Promise<UserModel> {
+  async findOne(email: String): Promise<UserModel> {
     try {
-      return await User.findOne({ username });
+      return await User.findOne({ email });
     } catch (e) {
       throw new Error(e);
     }

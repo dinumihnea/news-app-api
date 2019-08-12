@@ -12,28 +12,23 @@ describe('isValid', () => {
     expect(userRouter.isValid({} as UserModel)).toBe(false);
   });
 
-  it('should return false when model does not contains username field', () => {
-    const user = new User({ email: 'a@domain.com', password: '' });
-    expect(userRouter.isValid(user)).toBe(false);
-  });
-
   it('should return false when model does not contains email field', () => {
-    const user = new User({ username: 'a', password: 'a' });
+    const user = new User({ password: '12345678' });
     expect(userRouter.isValid(user)).toBe(false);
   });
 
   it('should return false when model does not contains password field', () => {
-    const user = new User({ username: 'a', email: 'a@doamain.com' });
+    const user = new User({ email: 'a@doamain.com' });
     expect(userRouter.isValid(user)).toBe(false);
   });
 
   it('should return false when model contains an invalid email', () => {
-    const user = new User({ username: 'a', email: 'a', password: 'a' });
+    const user = new User({ email: 'a', password: 'a' });
     expect(userRouter.isValid(user)).toBe(false);
   });
 
-  it('should return true when model contains valid username and valid email', () => {
-    const user = new User({ username: 'a', email: 'a@domain.com', password: 'a' });
+  it('should return true when model is valid', () => {
+    const user = new User({ email: 'a@domain.com', password: '12345678' });
     expect(userRouter.isValid(user)).toBe(true);
   });
 });

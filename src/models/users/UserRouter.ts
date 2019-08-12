@@ -25,8 +25,10 @@ export class UserRouter implements CollectionRouter<UserModel>, ValidationProvid
 
   create = async (req: Request, res: Response): Promise<void> => {
     const draftUser = new User(req.body);
-    if (!this.isValid(draftUser)) {
-      res.status(400).json({ error: 'Invalid User model' });
+    try {
+      await draftUser.validate();
+    } catch (e) {
+      res.status(400).json({ error: e.message });
       return;
     }
 
@@ -96,8 +98,9 @@ export class UserRouter implements CollectionRouter<UserModel>, ValidationProvid
     }
 
     try {
-      const user = await this.service.update(draftUser);
-      res.status(200).json(user);
+      const data = await this.service.update(draftUser);
+      // Responds with an “No Content” status
+      res.status(data.nModified !== 0 ? 204 : 304).json();
     } catch (e) {
       console.error('Error happened during the update.', e);
       res.status(500).json({ error: e.message });
@@ -105,7 +108,7 @@ export class UserRouter implements CollectionRouter<UserModel>, ValidationProvid
   };
 
   isValid(model: UserModel): boolean {
-    return !!(model && model.username && Helpers.isValidEmail(model.email) && model.password);
+    return !!(model && Helpers.isValidEmail(model.email) && model.password);
   }
 
 }
