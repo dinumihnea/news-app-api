@@ -56,7 +56,7 @@ export default class NewsService implements NewsRepository {
   save = async (draftNews: NewsModel): Promise<NewsModel> => {
     const category = await this.categoryService.findOne(draftNews.category.key);
     if (!category) {
-      throw new Error('The given news category does not exists');
+      throw new Error('The given news category does not exist');
     } else {
       draftNews.category = category;
     }
@@ -73,7 +73,7 @@ export default class NewsService implements NewsRepository {
   update = async (model: NewsModel): Promise<any> => {
     let news = await this.findById(model._id);
     if (!news) {
-      throw new Error('News with given identifiers does not exists');
+      throw new Error('News with given identifiers does not exist');
     }
 
     try {

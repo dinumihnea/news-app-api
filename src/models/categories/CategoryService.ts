@@ -44,7 +44,7 @@ export default class CategoryService implements CategoryRepository {
   async update(model: CategoryModel): Promise<any> {
     let category = await this.findOne(model.key);
     if (!category) {
-      throw new Error('Category with given key does not exists');
+      throw new Error('Category with given key does not exist');
     }
     try {
       return await category.updateOne({

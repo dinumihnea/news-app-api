@@ -161,6 +161,50 @@ export class UserRouter implements CollectionRouter<UserModel>, ValidationProvid
     }
   };
 
+  saveBookmark = async (req: Request & AuthRequest, res: Response): Promise<void> => {
+    const newsId = req.body.newsId;
+    if (!newsId) {
+      res.status(400).json({ error: 'Request body does not contains a newsId.' });
+      return;
+    }
+    const userId = req.user._id;
+    if (!userId) {
+      res.status(400).json({ error: 'Invalid User id' });
+      return;
+    }
+
+    try {
+      const data = await this.service.saveBookmark(userId, newsId);
+      // Responds with an “No Content” status
+      res.status(data.nModified !== 0 ? 204 : 304).json();
+    } catch (e) {
+      console.error('Error happened during the update.', e);
+      res.status(500).json({ error: e.message });
+    }
+  };
+
+  removeBookmark = async (req: Request & AuthRequest, res: Response): Promise<void> => {
+    const newsId = req.body.newsId;
+    if (!newsId) {
+      res.status(400).json({ error: 'Request body does not contains a newsId.' });
+      return;
+    }
+    const userId = req.user._id;
+    if (!userId) {
+      res.status(400).json({ error: 'Invalid User id' });
+      return;
+    }
+
+    try {
+      const data = await this.service.removeBookmark(userId, newsId);
+      // Responds with an “No Content” status
+      res.status(data.nModified !== 0 ? 204 : 304).json();
+    } catch (e) {
+      console.error('Error happened during the update.', e);
+      res.status(500).json({ error: e.message });
+    }
+  };
+
   isValid(model: UserModel): boolean {
     return !!(model && Helpers.isValidEmail(model.email) && model.password);
   }
@@ -168,6 +212,8 @@ export class UserRouter implements CollectionRouter<UserModel>, ValidationProvid
   private routes(): void {
     this.router.get('/me', AuthMiddleware.requireAuthentication, this.findCurrentUser);
     this.router.get('/me/bookmarks', AuthMiddleware.requireAuthentication, this.findBookmarks);
+    this.router.post('/me/bookmarks', AuthMiddleware.requireAuthentication, this.saveBookmark);
+    this.router.delete('/me/bookmarks', AuthMiddleware.requireAuthentication, this.removeBookmark);
 
     this.router.get('/', AuthMiddleware.requireAuthentication, this.findAll);
     this.router.get('/:id', AuthMiddleware.requireAuthentication, this.findOne);
