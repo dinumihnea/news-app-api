@@ -89,7 +89,8 @@ export default class NewsService implements NewsRepository {
         .find({ tags: { $in: key } })
         .sort({ creationDate: -1 })
         .skip(offset)
-        .limit(limit);
+        .limit(limit)
+        .select('-body');
     } catch (e) {
       throw new Error(e);
     }
@@ -104,14 +105,16 @@ export default class NewsService implements NewsRepository {
           .find({ 'category._id': key })
           .sort({ creationDate: -1 })
           .skip(offset)
-          .limit(limit);
+          .limit(limit)
+          .select('-body');
       } else {
         // Search by category.key match
         return await News
           .find({ 'category.key': key })
           .sort({ creationDate: -1 })
           .skip(offset)
-          .limit(limit);
+          .limit(limit)
+          .select('-body');
       }
     } catch (e) {
       throw new Error(e);
@@ -148,6 +151,19 @@ export default class NewsService implements NewsRepository {
   findBySlug = async (slug: String): Promise<NewsModel> => {
     try {
       return await News.findOne({ slug });
+    } catch (e) {
+      throw new Error(e);
+    }
+  };
+
+  findByIdIn = async (ids: Array<String>, limit: number, offset: number): Promise<Array<NewsModel>> => {
+    try {
+      return await News.find({
+        _id: {
+          $in: ids
+        }
+      }).skip(offset)
+        .limit(limit).select('-body');
     } catch (e) {
       throw new Error(e);
     }

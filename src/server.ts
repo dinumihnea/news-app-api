@@ -23,6 +23,7 @@ class Server {
     this.routes();
   }
 
+  // TODO check Env variables before express starts.
   private static checkEnvVars(): void {
     const jwtPrivateKey = config.get('jwtPrivateKey');
     const prefix = config.get('prefix');

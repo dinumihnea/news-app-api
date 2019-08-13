@@ -19,6 +19,25 @@ export class UserRouter implements CollectionRouter<UserModel>, ValidationProvid
     this.routes();
   }
 
+  findBookmarks = async (req: Request & AuthRequest, res: Response): Promise<void> => {
+    const offset = req.query.offset ? parseInt(req.query.offset) : 0;
+    const limit = req.query.limit ? parseInt(req.query.limit) : UserRouter.PAGE_SIZE;
+
+    const id = req.user._id;
+    if (!id) {
+      res.status(400).json({ error: 'Invalid User id' });
+      return;
+    }
+
+    try {
+      const users = await this.service.findBookmarks(id, limit, offset);
+      res.status(200).json(users);
+    } catch (e) {
+      console.error('Error happened during the query.', e);
+      res.status(500).json({ error: e.message });
+    }
+  };
+
   private static async hashPassword(draftUser: UserModel): Promise<any> {
     const salt = await bcrypt.genSalt(10);
     draftUser.password = await bcrypt.hash(draftUser.password, salt);
@@ -94,7 +113,6 @@ export class UserRouter implements CollectionRouter<UserModel>, ValidationProvid
       res.status(500).json({ error: e.message });
     }
   };
-
   /**
    * Provides only the public information about the user
    */
@@ -126,15 +144,6 @@ export class UserRouter implements CollectionRouter<UserModel>, ValidationProvid
     }
   };
 
-  private routes(): void {
-    this.router.get('/me', AuthMiddleware.requireAuthentication, this.findCurrentUser);
-    this.router.get('/', AuthMiddleware.requireAuthentication, this.findAll);
-    this.router.get('/:id', AuthMiddleware.requireAuthentication, this.findOne);
-    this.router.post('/', this.create);
-    this.router.delete('/:id', [AuthMiddleware.requireAuthentication, AuthMiddleware.requireAdminRole], this.delete);
-    this.router.put('/', AuthMiddleware.requireAuthentication, this.update);
-  }
-
   update = async (req: Request, res: Response): Promise<void> => {
     const draftUser = req.body;
     if (!this.isValid(draftUser)) {
@@ -154,6 +163,17 @@ export class UserRouter implements CollectionRouter<UserModel>, ValidationProvid
 
   isValid(model: UserModel): boolean {
     return !!(model && Helpers.isValidEmail(model.email) && model.password);
+  }
+
+  private routes(): void {
+    this.router.get('/me', AuthMiddleware.requireAuthentication, this.findCurrentUser);
+    this.router.get('/me/bookmarks', AuthMiddleware.requireAuthentication, this.findBookmarks);
+
+    this.router.get('/', AuthMiddleware.requireAuthentication, this.findAll);
+    this.router.get('/:id', AuthMiddleware.requireAuthentication, this.findOne);
+    this.router.post('/', this.create);
+    this.router.delete('/:id', [AuthMiddleware.requireAuthentication, AuthMiddleware.requireAdminRole], this.delete);
+    this.router.put('/', AuthMiddleware.requireAuthentication, this.update);
   }
 
 }

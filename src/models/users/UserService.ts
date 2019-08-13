@@ -8,7 +8,7 @@ export default class UserService implements UserRepository {
   private newsService: NewsService = new NewsService();
 
   constructor() {
-    this.save = this.save.bind(this);
+    this.findBookmarks = this.findBookmarks.bind(this);
   }
 
   async checkNews(newsId: String): Promise<NewsModel> {
@@ -88,6 +88,20 @@ export default class UserService implements UserRepository {
   async findOneIncludePassword(email: String): Promise<UserModel> {
     try {
       return await User.findOne({ email });
+    } catch (e) {
+      throw new Error(e);
+    }
+  }
+
+  async findBookmarks(id: String, limit: number, offset: number): Promise<Array<NewsModel>> {
+    const user = await this.findById(id);
+    if (!user) {
+      throw new Error(`User with id: ${id} does not exist`);
+    }
+
+    try {
+      const newsesId = user.bookmarks.reverse();
+      return await this.newsService.findByIdIn(newsesId, limit, offset);
     } catch (e) {
       throw new Error(e);
     }
