@@ -4,6 +4,10 @@ import { User, UserModel } from './User';
 import UserService from './UserService';
 import ValidationProvider from '../../repositories/ValidationProvider';
 import Helpers from '../../utils/Helpers';
+import * as bcrypt from 'bcrypt';
+import * as mongoose from 'mongoose';
+import * as _ from 'lodash';
+import AuthMiddleware, { AuthRequest } from '../../auth/AuthMiddleware';
 
 export class UserRouter implements CollectionRouter<UserModel>, ValidationProvider<UserModel> {
 
@@ -15,12 +19,9 @@ export class UserRouter implements CollectionRouter<UserModel>, ValidationProvid
     this.routes();
   }
 
-  private routes(): void {
-    this.router.get('/', this.findAll);
-    this.router.get('/:id', this.findOne);
-    this.router.post('/', this.create);
-    this.router.delete('/:id', this.delete);
-    this.router.put('/', this.update);
+  private static async hashPassword(draftUser: UserModel): Promise<any> {
+    const salt = await bcrypt.genSalt(10);
+    draftUser.password = await bcrypt.hash(draftUser.password, salt);
   }
 
   create = async (req: Request, res: Response): Promise<void> => {
@@ -31,11 +32,35 @@ export class UserRouter implements CollectionRouter<UserModel>, ValidationProvid
       res.status(400).json({ error: e.message });
       return;
     }
+    try {
+      await UserRouter.hashPassword(draftUser);
+      const user = await this.service.save(draftUser);
+      res.status(201).header('x-auth-token', user.generateAuthToken()).json(user.getPublicFields());
+    } catch (e) {
+      res.status(500).json({ error: e.message });
+    }
+  };
+
+  /**
+   * Provides all information about the user
+   */
+  findCurrentUser = async (req: Request & AuthRequest, res: Response): Promise<void> => {
+    const id = req.user._id;
+    if (!id) {
+      res.status(400).json({ error: 'Invalid User id' });
+      return;
+    }
 
     try {
-      const user = await this.service.save(draftUser);
-      res.status(201).json({ user });
+      // Find by id
+      const user = await this.service.findById(id);
+      if (!user) {
+        res.status(400).json({ error: 'User with given identifier does not exist.' });
+        return;
+      }
+      res.status(200).json(_.pick(user, ['_id', 'email', 'firstName', 'lastName', 'createdAt']));
     } catch (e) {
+      console.error('Error happened during the query.', e);
       res.status(500).json({ error: e.message });
     }
   };
@@ -70,6 +95,9 @@ export class UserRouter implements CollectionRouter<UserModel>, ValidationProvid
     }
   };
 
+  /**
+   * Provides only the public information about the user
+   */
   findOne = async (req: Request, res: Response): Promise<void> => {
     const id = req.params.id;
     if (!id) {
@@ -78,17 +106,34 @@ export class UserRouter implements CollectionRouter<UserModel>, ValidationProvid
     }
 
     try {
-      const user = await this.service.findById(id);
+      let user = null;
+      // Check if the given param is an ObjectId or a key
+      if (mongoose.Types.ObjectId.isValid(id)) {
+        // Find by id
+        user = await this.service.findById(id);
+      } else {
+        // Find by email
+        user = await this.service.findOne(id);
+      }
       if (!user) {
-        res.status(400).json({ error: 'User with given id does not exists.' });
+        res.status(400).json({ error: 'User with given identifier does not exist.' });
         return;
       }
-      res.status(200).json(user);
+      res.status(200).json(user.getPublicFields());
     } catch (e) {
       console.error('Error happened during the query.', e);
       res.status(500).json({ error: e.message });
     }
   };
+
+  private routes(): void {
+    this.router.get('/me', AuthMiddleware.requireAuthentication, this.findCurrentUser);
+    this.router.get('/', AuthMiddleware.requireAuthentication, this.findAll);
+    this.router.get('/:id', AuthMiddleware.requireAuthentication, this.findOne);
+    this.router.post('/', this.create);
+    this.router.delete('/:id', [AuthMiddleware.requireAuthentication, AuthMiddleware.requireAdminRole], this.delete);
+    this.router.put('/', AuthMiddleware.requireAuthentication, this.update);
+  }
 
   update = async (req: Request, res: Response): Promise<void> => {
     const draftUser = req.body;

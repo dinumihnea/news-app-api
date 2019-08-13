@@ -5,6 +5,7 @@ import { CollectionRouter } from '../../router/CollectionRouter';
 import { I18n, Language } from '../../i18n/I18n';
 import CategoryService from './CategoryService';
 import ValidationProvider from '../../repositories/ValidationProvider';
+import AuthMiddleware from '../../auth/AuthMiddleware';
 
 export class CategoryRouter implements CollectionRouter<CategoryModel>, I18n<CategoryModel>, ValidationProvider<CategoryModel> {
 
@@ -18,9 +19,9 @@ export class CategoryRouter implements CollectionRouter<CategoryModel>, I18n<Cat
   private routes(): void {
     this.router.get('/', this.findAll);
     this.router.get('/:key', this.findOne);
-    this.router.post('/', this.create);
-    this.router.put('/', this.update);
-    this.router.delete('/:key', this.delete);
+    this.router.post('/', [AuthMiddleware.requireAuthentication, AuthMiddleware.requireAdminRole], this.create);
+    this.router.put('/', [AuthMiddleware.requireAuthentication, AuthMiddleware.requireAdminRole], this.update);
+    this.router.delete('/:key', [AuthMiddleware.requireAuthentication, AuthMiddleware.requireAdminRole], this.delete);
   }
 
   create = async (req: Request, res: Response): Promise<void> => {

@@ -3,6 +3,7 @@ import { CollectionRouter } from '../../router/CollectionRouter';
 import { News, NewsModel } from './News';
 import NewsService from './NewsService';
 import ValidationProvider from '../../repositories/ValidationProvider';
+import AuthMiddleware from '../../auth/AuthMiddleware';
 
 export class NewsRouter implements CollectionRouter<NewsModel>, ValidationProvider<NewsModel> {
 
@@ -19,9 +20,9 @@ export class NewsRouter implements CollectionRouter<NewsModel>, ValidationProvid
     this.router.get('/categories/:category', this.findByCategory);
     this.router.get('/tags/:tag', this.findByTagIn);
     this.router.get('/:id', this.findOne);
-    this.router.post('/', this.create);
-    this.router.put('/', this.update);
-    this.router.delete('/:id', this.delete);
+    this.router.post('/', [AuthMiddleware.requireAuthentication, AuthMiddleware.requireModeratorRole], this.create);
+    this.router.put('/', [AuthMiddleware.requireAuthentication, AuthMiddleware.requireModeratorRole], this.update);
+    this.router.delete('/:id', [AuthMiddleware.requireAuthentication, AuthMiddleware.requireModeratorRole], this.delete);
   }
 
   create = async (req: Request, res: Response): Promise<void> => {

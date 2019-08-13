@@ -12,6 +12,7 @@ import CategoryRouter from './models/categories';
 import TagRouter from './models/tags';
 import UserRouter from './models/users';
 import NewsRouter from './models/news';
+import AuthRouter from './auth';
 
 class Server {
   public app: express.Application;
@@ -20,6 +21,16 @@ class Server {
     this.app = express();
     this.config();
     this.routes();
+  }
+
+  private static checkEnvVars(): void {
+    const jwtPrivateKey = config.get('jwtPrivateKey');
+    const prefix = config.get('prefix');
+    const version = config.get('version');
+    if (jwtPrivateKey && prefix && version) {
+      console.error('Required environment variables are not defined.');
+      process.exit(1);
+    }
   }
 
   public config(): void {
@@ -47,11 +58,11 @@ class Server {
       res.header('Access-Control-Allow-Origin', ALLOW_ORIGIN);
       res.header(
         'Access-Control-Allow-Methods',
-        'GET, POST, PUT, DELETE, OPTIONS',
+        'GET, POST, PUT, DELETE, OPTIONS'
       );
       res.header(
         'Access-Control-Allow-Headers',
-        'Origin, X-Requested-With, Content-Type, Accept, Authorization, Access-Control-Allow-Credentials',
+        'Origin, X-Requested-With, Content-Type, Accept, Authorization, Access-Control-Allow-Credentials'
       );
       res.header('Access-Control-Allow-Credentials', 'true');
       next();
@@ -66,6 +77,8 @@ class Server {
     this.app.use(`/${config.get('prefix')}/${config.get('version')}/tags`, TagRouter);
     this.app.use(`/${config.get('prefix')}/${config.get('version')}/users`, UserRouter);
     this.app.use(`/${config.get('prefix')}/${config.get('version')}/categories`, CategoryRouter);
+
+    this.app.use(`/${config.get('prefix')}/${config.get('version')}/auth`, AuthRouter);
   }
 }
 

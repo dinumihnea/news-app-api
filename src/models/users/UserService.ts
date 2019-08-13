@@ -33,7 +33,8 @@ export default class UserService implements UserRepository {
       return await User.find()
         .sort({ creationDate: -1 })
         .skip(offset)
-        .limit(limit);
+        .limit(limit)
+        .select('-password');
     } catch (e) {
       throw new Error(e);
     }
@@ -41,7 +42,8 @@ export default class UserService implements UserRepository {
 
   async findById(_id: String): Promise<UserModel> {
     try {
-      return await User.findById(_id);
+      return await User.findById(_id)
+        .select('-password');
     } catch (e) {
       throw new Error(e);
     }
@@ -49,17 +51,25 @@ export default class UserService implements UserRepository {
 
   async findOne(email: String): Promise<UserModel> {
     try {
-      return await User.findOne({ email });
+      return await User.findOne({ email })
+        .select('-password');
     } catch (e) {
       throw new Error(e);
     }
   }
 
   async update(model: UserModel): Promise<any> {
-    let user = await this.findById(model._id);
+    let user = null;
+    try {
+      user = await User.findById(model._id);
+    } catch (e) {
+      throw new Error(e);
+    }
+
     if (!user) {
       throw new Error('User does not exists');
     }
+
     try {
       return await user.updateOne({ $set: { ...model } });
     } catch (e) {
@@ -70,6 +80,14 @@ export default class UserService implements UserRepository {
   async delete(_id: String): Promise<any> {
     try {
       return await User.deleteOne({ _id });
+    } catch (e) {
+      throw new Error(e);
+    }
+  }
+
+  async findOneIncludePassword(email: String): Promise<UserModel> {
+    try {
+      return await User.findOne({ email });
     } catch (e) {
       throw new Error(e);
     }

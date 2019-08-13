@@ -4,6 +4,7 @@ import { CollectionRouter } from '../../router/CollectionRouter';
 import * as mongoose from 'mongoose';
 import TagService from './TagService';
 import ValidationProvider from '../../repositories/ValidationProvider';
+import AuthMiddleware from '../../auth/AuthMiddleware';
 
 export class TagRouter implements CollectionRouter<TagModel>, ValidationProvider<TagModel> {
 
@@ -15,13 +16,9 @@ export class TagRouter implements CollectionRouter<TagModel>, ValidationProvider
     this.routes();
   }
 
-  private routes(): void {
-    this.router.get('/', this.findAll);
-    this.router.post('/', this.create);
-    this.router.get('/:id', this.findOne);
-    this.router.delete('/:key', this.delete);
-    this.router.put('/', this.update);
-  }
+  update = async (req: Request, res: Response): Promise<void> => {
+    res.status(403).json({ error: 'The tag can not be updated as entity, use delete and create instead' });
+  };
 
   create = async (req: Request, res: Response): Promise<void> => {
     const key: string = req.body.key;
@@ -102,9 +99,13 @@ export class TagRouter implements CollectionRouter<TagModel>, ValidationProvider
     }
   };
 
-  update = async (req: Request, res: Response): Promise<void> => {
-    res.status(403).json({ error: 'The tag can not be updated as entity, use delete and create instead' })
-  };
+  private routes(): void {
+    this.router.get('/', this.findAll);
+    this.router.post('/', [AuthMiddleware.requireAuthentication, AuthMiddleware.requireModeratorRole], this.create);
+    this.router.get('/:id', this.findOne);
+    this.router.delete('/:key', [AuthMiddleware.requireAuthentication, AuthMiddleware.requireModeratorRole], this.delete);
+    this.router.put('/', this.update);
+  }
 
   isValid(model: TagModel): boolean {
     return !!(model && model.key);
