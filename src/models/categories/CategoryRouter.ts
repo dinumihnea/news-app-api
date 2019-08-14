@@ -61,6 +61,10 @@ export default class CategoryRouter implements CollectionRouter<CategoryModel>, 
     }
     try {
       const category = await this.service.findOne(key);
+      if (!category) {
+        res.status(400).json({ error: 'Category with given key does not exist.' });
+        return;
+      }
       res.status(200).json(this.translate(category, lang));
     } catch (e) {
       console.error('Error happened during the query', e);

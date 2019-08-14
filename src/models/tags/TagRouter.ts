@@ -67,6 +67,10 @@ class TagRouter implements CollectionRouter<TagModel>, ValidationProvider<TagMod
       } else {
         // Find by tag key
         const tag = await this.service.findOne(id);
+        if (!tag) {
+          res.status(400).json({ error: 'Tag does not exist' });
+          return;
+        }
         res.status(200).json(tag);
       }
     } catch (e) {

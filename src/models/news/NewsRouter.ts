@@ -120,6 +120,10 @@ export default class NewsRouter implements CollectionRouter<NewsModel>, Validati
 
     try {
       const news = await this.service.findOne(id);
+      if (!news) {
+        res.status(400).json({ error: 'News with given id does not exist' });
+        return;
+      }
       res.status(200).json(news);
     } catch (e) {
       console.error('Error happened during the query.', e);
