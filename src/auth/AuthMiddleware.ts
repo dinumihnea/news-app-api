@@ -14,8 +14,9 @@ export interface AuthRequest {
  * Authentication/Authorization express provider middleware
  */
 export default class AuthMiddleware {
+  // TODO implement DB user checking to avoid cases when user is updated or deleted
 
-  public static requireAuthentication(req: Request & AuthRequest, res: Response, next: NextFunction) {
+  public requireAuthorization(req: Request & AuthRequest, res: Response, next: NextFunction) {
     const token = req.header('x-auth-token');
     if (!token) {
       res.status(401).json({ error: 'Access denied. No token provided.' });
@@ -31,7 +32,7 @@ export default class AuthMiddleware {
     }
   }
 
-  public static requireAdminRole(req: Request & AuthRequest, res: Response, next: NextFunction) {
+  public requireAdminRole(req: Request & AuthRequest, res: Response, next: NextFunction) {
     const role = req.user.role;
     if (role !== 'admin') {
       res.status(403).json({ error: 'Access denied. Given user is not an admin.' });
@@ -40,7 +41,7 @@ export default class AuthMiddleware {
     next();
   }
 
-  public static requireModeratorRole(req: Request & AuthRequest, res: Response, next: NextFunction) {
+  public requireModeratorRole(req: Request & AuthRequest, res: Response, next: NextFunction) {
     const role = req.user.role;
     // Admin can do all moderator actions
     if (role !== 'moderator' && role !== 'admin') {

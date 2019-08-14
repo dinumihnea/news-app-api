@@ -7,21 +7,23 @@ import CategoryService from './CategoryService';
 import ValidationProvider from '../../repositories/ValidationProvider';
 import AuthMiddleware from '../../auth/AuthMiddleware';
 
-export class CategoryRouter implements CollectionRouter<CategoryModel>, I18n<CategoryModel>, ValidationProvider<CategoryModel> {
+export default class CategoryRouter implements CollectionRouter<CategoryModel>, I18n<CategoryModel>, ValidationProvider<CategoryModel> {
 
   public router: Router = Router();
   private service: CategoryService = new CategoryService();
+  private auth: AuthMiddleware;
 
-  constructor() {
+  constructor(auth: AuthMiddleware) {
+    this.auth = auth;
     this.routes();
   }
 
   private routes(): void {
     this.router.get('/', this.findAll);
     this.router.get('/:key', this.findOne);
-    this.router.post('/', [AuthMiddleware.requireAuthentication, AuthMiddleware.requireAdminRole], this.create);
-    this.router.put('/', [AuthMiddleware.requireAuthentication, AuthMiddleware.requireAdminRole], this.update);
-    this.router.delete('/:key', [AuthMiddleware.requireAuthentication, AuthMiddleware.requireAdminRole], this.delete);
+    this.router.post('/', [this.auth.requireAuthorization, this.auth.requireAdminRole], this.create);
+    this.router.put('/', [this.auth.requireAuthorization, this.auth.requireAdminRole], this.update);
+    this.router.delete('/:key', [this.auth.requireAuthorization, this.auth.requireAdminRole], this.delete);
   }
 
   create = async (req: Request, res: Response): Promise<void> => {
@@ -114,5 +116,3 @@ export class CategoryRouter implements CollectionRouter<CategoryModel>, I18n<Cat
     return translatedCategories;
   }
 }
-
-export default new CategoryRouter().router;

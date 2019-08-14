@@ -6,13 +6,15 @@ import TagService from './TagService';
 import ValidationProvider from '../../repositories/ValidationProvider';
 import AuthMiddleware from '../../auth/AuthMiddleware';
 
-export class TagRouter implements CollectionRouter<TagModel>, ValidationProvider<TagModel> {
+class TagRouter implements CollectionRouter<TagModel>, ValidationProvider<TagModel> {
 
   public static PAGE_SIZE = 12;
   public router: Router = Router();
   private service: TagService = new TagService;
+  private auth: AuthMiddleware;
 
-  constructor() {
+  constructor(auth: AuthMiddleware) {
+    this.auth = auth;
     this.routes();
   }
 
@@ -101,9 +103,9 @@ export class TagRouter implements CollectionRouter<TagModel>, ValidationProvider
 
   private routes(): void {
     this.router.get('/', this.findAll);
-    this.router.post('/', [AuthMiddleware.requireAuthentication, AuthMiddleware.requireModeratorRole], this.create);
+    this.router.post('/', [this.auth.requireAuthorization, this.auth.requireModeratorRole], this.create);
     this.router.get('/:id', this.findOne);
-    this.router.delete('/:key', [AuthMiddleware.requireAuthentication, AuthMiddleware.requireModeratorRole], this.delete);
+    this.router.delete('/:key', [this.auth.requireAuthorization, this.auth.requireModeratorRole], this.delete);
     this.router.put('/', this.update);
   }
 
@@ -113,4 +115,4 @@ export class TagRouter implements CollectionRouter<TagModel>, ValidationProvider
 
 }
 
-export default new TagRouter().router;
+export default TagRouter;

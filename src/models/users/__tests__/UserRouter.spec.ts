@@ -1,7 +1,8 @@
-import { UserRouter } from '../UserRouter';
+import UserRouter from '../UserRouter';
 import { User, UserModel } from '../User';
+import AuthMiddleware from '../../../auth/AuthMiddleware';
 
-const userRouter: UserRouter = new UserRouter();
+const userRouter: UserRouter = new UserRouter(new AuthMiddleware());
 
 describe('isValid', () => {
   it('should return false when model is null', () => {

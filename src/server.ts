@@ -13,6 +13,7 @@ import TagRouter from './models/tags';
 import UserRouter from './models/users';
 import NewsRouter from './models/news';
 import AuthRouter from './auth';
+import AuthMiddleware from './auth/AuthMiddleware';
 
 class Server {
   public app: express.Application;
@@ -72,12 +73,13 @@ class Server {
 
   public routes(): void {
     const router: express.Router = express.Router();
+    const auth = new AuthMiddleware();
 
     this.app.use(`/${config.get('prefix')}/${config.get('version')}/`, router);
-    this.app.use(`/${config.get('prefix')}/${config.get('version')}/news`, NewsRouter);
-    this.app.use(`/${config.get('prefix')}/${config.get('version')}/tags`, TagRouter);
-    this.app.use(`/${config.get('prefix')}/${config.get('version')}/users`, UserRouter);
-    this.app.use(`/${config.get('prefix')}/${config.get('version')}/categories`, CategoryRouter);
+    this.app.use(`/${config.get('prefix')}/${config.get('version')}/news`, new NewsRouter(auth).router);
+    this.app.use(`/${config.get('prefix')}/${config.get('version')}/tags`, new TagRouter(auth).router);
+    this.app.use(`/${config.get('prefix')}/${config.get('version')}/users`, new UserRouter(auth).router);
+    this.app.use(`/${config.get('prefix')}/${config.get('version')}/categories`, new CategoryRouter(auth).router);
 
     this.app.use(`/${config.get('prefix')}/${config.get('version')}/auth`, AuthRouter);
   }

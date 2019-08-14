@@ -1,7 +1,8 @@
-import { NewsRouter } from '../NewsRouter';
+import NewsRouter from '../NewsRouter';
 import { News, NewsModel } from '../News';
+import AuthMiddleware from '../../../auth/AuthMiddleware';
 
-const tagRouter: NewsRouter = new NewsRouter();
+const tagRouter: NewsRouter = new NewsRouter(new AuthMiddleware());
 
 describe('isValid', () => {
   it('should return false when model is null', () => {

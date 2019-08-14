@@ -1,7 +1,8 @@
-import { CategoryRouter } from '../CategoryRouter';
+import CategoryRouter from '../CategoryRouter';
 import { Category, CategoryModel } from '../Category';
+import AuthMiddleware from '../../../auth/AuthMiddleware';
 
-const categoryRouter: CategoryRouter = new CategoryRouter();
+const categoryRouter: CategoryRouter = new CategoryRouter(new AuthMiddleware());
 
 describe('isValid', () => {
   it('should return false when given model is null', () => {

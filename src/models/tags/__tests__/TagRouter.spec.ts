@@ -1,7 +1,8 @@
-import { TagRouter } from '../TagRouter';
+import TagRouter from '../TagRouter';
 import { Tag, TagModel } from '../Tag';
+import AuthMiddleware from '../../../auth/AuthMiddleware';
 
-const tagRouter: TagRouter = new TagRouter();
+const tagRouter: TagRouter = new TagRouter(new AuthMiddleware());
 
 describe('isValid', () => {
   it('should return false when model is null', () => {

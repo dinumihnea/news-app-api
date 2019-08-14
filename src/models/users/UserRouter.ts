@@ -9,13 +9,15 @@ import * as mongoose from 'mongoose';
 import * as _ from 'lodash';
 import AuthMiddleware, { AuthRequest } from '../../auth/AuthMiddleware';
 
-export class UserRouter implements CollectionRouter<UserModel>, ValidationProvider<UserModel> {
+export default class UserRouter implements CollectionRouter<UserModel>, ValidationProvider<UserModel> {
 
   public static PAGE_SIZE = 48;
   public router: Router = Router();
   private service: UserService = new UserService();
+  private auth: AuthMiddleware;
 
-  constructor() {
+  constructor(auth: AuthMiddleware) {
+    this.auth = auth;
     this.routes();
   }
 
@@ -210,18 +212,16 @@ export class UserRouter implements CollectionRouter<UserModel>, ValidationProvid
   }
 
   private routes(): void {
-    this.router.get('/me', AuthMiddleware.requireAuthentication, this.findCurrentUser);
-    this.router.get('/me/bookmarks', AuthMiddleware.requireAuthentication, this.findBookmarks);
-    this.router.post('/me/bookmarks', AuthMiddleware.requireAuthentication, this.saveBookmark);
-    this.router.delete('/me/bookmarks', AuthMiddleware.requireAuthentication, this.removeBookmark);
+    this.router.get('/me', this.auth.requireAuthorization, this.findCurrentUser);
+    this.router.get('/me/bookmarks', this.auth.requireAuthorization, this.findBookmarks);
+    this.router.post('/me/bookmarks', this.auth.requireAuthorization, this.saveBookmark);
+    this.router.delete('/me/bookmarks', this.auth.requireAuthorization, this.removeBookmark);
 
-    this.router.get('/', AuthMiddleware.requireAuthentication, this.findAll);
-    this.router.get('/:id', AuthMiddleware.requireAuthentication, this.findOne);
+    this.router.get('/', this.auth.requireAuthorization, this.findAll);
+    this.router.get('/:id', this.auth.requireAuthorization, this.findOne);
     this.router.post('/', this.create);
-    this.router.delete('/:id', [AuthMiddleware.requireAuthentication, AuthMiddleware.requireAdminRole], this.delete);
-    this.router.put('/', AuthMiddleware.requireAuthentication, this.update);
+    this.router.delete('/:id', [this.auth.requireAuthorization, this.auth.requireAdminRole], this.delete);
+    this.router.put('/', this.auth.requireAuthorization, this.update);
   }
 
 }
-
-export default new UserRouter().router;

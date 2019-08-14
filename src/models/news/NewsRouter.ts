@@ -5,13 +5,15 @@ import NewsService from './NewsService';
 import ValidationProvider from '../../repositories/ValidationProvider';
 import AuthMiddleware from '../../auth/AuthMiddleware';
 
-export class NewsRouter implements CollectionRouter<NewsModel>, ValidationProvider<NewsModel> {
+export default class NewsRouter implements CollectionRouter<NewsModel>, ValidationProvider<NewsModel> {
 
   public static PAGE_SIZE = 48;
   public router: Router = Router();
   private service: NewsService = new NewsService();
+  private auth: AuthMiddleware;
 
-  constructor() {
+  constructor(auth: AuthMiddleware) {
+    this.auth = auth;
     this.routes();
   }
 
@@ -20,9 +22,9 @@ export class NewsRouter implements CollectionRouter<NewsModel>, ValidationProvid
     this.router.get('/categories/:category', this.findByCategory);
     this.router.get('/tags/:tag', this.findByTagIn);
     this.router.get('/:id', this.findOne);
-    this.router.post('/', [AuthMiddleware.requireAuthentication, AuthMiddleware.requireModeratorRole], this.create);
-    this.router.put('/', [AuthMiddleware.requireAuthentication, AuthMiddleware.requireModeratorRole], this.update);
-    this.router.delete('/:id', [AuthMiddleware.requireAuthentication, AuthMiddleware.requireModeratorRole], this.delete);
+    this.router.post('/', [this.auth.requireAuthorization, this.auth.requireModeratorRole], this.create);
+    this.router.put('/', [this.auth.requireAuthorization, this.auth.requireModeratorRole], this.update);
+    this.router.delete('/:id', [this.auth.requireAuthorization, this.auth.requireModeratorRole], this.delete);
   }
 
   create = async (req: Request, res: Response): Promise<void> => {
@@ -145,5 +147,3 @@ export class NewsRouter implements CollectionRouter<NewsModel>, ValidationProvid
   }
 
 }
-
-export default new NewsRouter().router;
