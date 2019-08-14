@@ -8,6 +8,7 @@ import * as bcrypt from 'bcrypt';
 import * as mongoose from 'mongoose';
 import * as _ from 'lodash';
 import AuthMiddleware, { AuthRequest } from '../../auth/AuthMiddleware';
+import { TOKEN_HEADER_KEY } from '../../utils/constants';
 
 export default class UserRouter implements CollectionRouter<UserModel>, ValidationProvider<UserModel> {
 
@@ -32,8 +33,8 @@ export default class UserRouter implements CollectionRouter<UserModel>, Validati
     }
 
     try {
-      const users = await this.service.findBookmarks(id, limit, offset);
-      res.status(200).json(users);
+      const newses = await this.service.findBookmarks(id, limit, offset);
+      res.status(200).json(newses);
     } catch (e) {
       console.error('Error happened during the query.', e);
       res.status(500).json({ error: e.message });
@@ -56,7 +57,7 @@ export default class UserRouter implements CollectionRouter<UserModel>, Validati
     try {
       await UserRouter.hashPassword(draftUser);
       const user = await this.service.save(draftUser);
-      res.status(201).header('x-auth-token', user.generateAuthToken()).json(user.getPublicFields());
+      res.status(201).header(TOKEN_HEADER_KEY, user.generateAuthToken()).json(user.getPublicFields());
     } catch (e) {
       res.status(500).json({ error: e.message });
     }
