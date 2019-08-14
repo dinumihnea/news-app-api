@@ -36,7 +36,7 @@ class Server {
   }
 
   public config(): void {
-    mongoose.connect(MONGO_DB_URL || process.env.MONGODB_URI, { useNewUrlParser: true })
+    mongoose.connect(MONGO_DB_URL || process.env.MONGODB_URI, { useNewUrlParser: true, useCreateIndex: true })
       .then(() => console.log('Successfully connected to MongoDB.'))
       .catch(error => console.error('Error during MongoDB connection:', error));
 
