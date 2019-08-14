@@ -56,6 +56,8 @@ export default class UserRouter implements CollectionRouter<UserModel>, Validati
     }
     try {
       await UserRouter.hashPassword(draftUser);
+      // Prevent role sending by the client
+      draftUser.role = 'simple';
       const user = await this.service.save(draftUser);
       res.status(201).header(TOKEN_HEADER_KEY, user.generateAuthToken()).json(user.getPublicFields());
     } catch (e) {
