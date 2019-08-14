@@ -25,6 +25,11 @@ export interface UserModel extends mongoose.Document {
    * Generates an authorization token which contains an user identifier
    */
   generateAuthToken(): string;
+
+  /**
+   * Gets the user's name to display
+   */
+  getDisplayName(): string
 }
 
 const UserSchema: Schema = new Schema(
@@ -77,6 +82,12 @@ UserSchema.methods.generateAuthToken = function (): string {
 
 UserSchema.methods.getPublicFields = function (): AuthRequest {
   return _.pick(this, ['_id', 'email', 'firstName', 'lastName']);
+};
+
+UserSchema.methods.getDisplayName = function (): string {
+  const fullName = `${this.firstName ? this.firstName : ''}  ${this.lastName ? this.lastName : ''}`
+    .trim().replace(/\s\s+/g, ' ');
+  return fullName ? fullName : this.email;
 };
 
 

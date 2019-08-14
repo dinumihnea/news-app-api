@@ -16,7 +16,6 @@ describe('isValid', () => {
   it('should return false when model does not contains category field', () => {
     const newsModel = new News({
       title: 'a',
-      author: 'a',
       body: 'a'
     });
     expect(tagRouter.isValid(newsModel)).toBe(false);
@@ -25,16 +24,6 @@ describe('isValid', () => {
   it('should return false when model does not contains title field', () => {
     const newsModel = new News({
       category: { key: 'a' },
-      author: 'a',
-      body: 'a'
-    });
-    expect(tagRouter.isValid(newsModel)).toBe(false);
-  });
-
-  it('should return false when model does not contains author field', () => {
-    const newsModel = new News({
-      category: { key: 'a' },
-      title: 'a',
       body: 'a'
     });
     expect(tagRouter.isValid(newsModel)).toBe(false);
@@ -53,7 +42,6 @@ describe('isValid', () => {
     const newsModel = new News({
       category: { key: 'a' },
       title: 'a',
-      author: 'a',
       body: 'a'
     });
     expect(tagRouter.isValid(newsModel)).toBe(true);

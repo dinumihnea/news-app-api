@@ -3,7 +3,7 @@ import { CollectionRouter } from '../../router/CollectionRouter';
 import { News, NewsModel } from './News';
 import NewsService from './NewsService';
 import ValidationProvider from '../../repositories/ValidationProvider';
-import AuthMiddleware from '../../auth/AuthMiddleware';
+import AuthMiddleware, { AuthRequest } from '../../auth/AuthMiddleware';
 
 export default class NewsRouter implements CollectionRouter<NewsModel>, ValidationProvider<NewsModel> {
 
@@ -27,7 +27,12 @@ export default class NewsRouter implements CollectionRouter<NewsModel>, Validati
     this.router.delete('/:id', [this.auth.requireAuthorization, this.auth.requireModeratorRole], this.delete);
   }
 
-  create = async (req: Request, res: Response): Promise<void> => {
+  create = async (req: Request & AuthRequest, res: Response): Promise<void> => {
+    const user = req.user;
+    if (!user) {
+      res.status(400).json({ error: 'Request does not contains user info.' });
+      return;
+    }
     const draftNews = req.body;
     if (!this.isValid(draftNews as NewsModel)) {
       res.status(400).json({ error: 'Invalid News model.' });
@@ -35,8 +40,10 @@ export default class NewsRouter implements CollectionRouter<NewsModel>, Validati
     }
 
     try {
-      const news = await this.service.save(new News(draftNews));
-      res.status(201).json({ news });
+      let news = new News(draftNews);
+      news.author = user.getDisplayName();
+      const savedNews = await this.service.save(news);
+      res.status(201).json({ savedNews });
     } catch (e) {
       console.error('Error happened during the save.', e);
       res.status(500).json({ error: e.message });
@@ -147,7 +154,7 @@ export default class NewsRouter implements CollectionRouter<NewsModel>, Validati
   };
 
   isValid(model: NewsModel): boolean {
-    return !!(model && model.category && model.category.key && model.title && model.author && model.body);
+    return !!(model && model.category && model.category.key && model.title && model.body);
   }
 
 }
