@@ -19,6 +19,7 @@ export default class NewsRouter implements CollectionRouter<NewsModel>, Validati
 
   private routes(): void {
     this.router.get('/', this.findAll);
+    this.router.get('/search', this.search);
     this.router.get('/categories/:category', this.findByCategory);
     this.router.get('/tags/:tag', this.findByTagIn);
     this.router.get('/:id', this.findOne);
@@ -117,6 +118,25 @@ export default class NewsRouter implements CollectionRouter<NewsModel>, Validati
       res.status(500).json({ error: e.message });
     }
   };
+
+  search = async (req: Request, res: Response): Promise<void> => {
+    const offset = req.query.offset ? parseInt(req.query.offset) : 0;
+    const limit = req.query.limit ? parseInt(req.query.limit) : NewsRouter.PAGE_SIZE;
+    // const lang = req.headers['content-language'];
+    const query = req.query.q;
+    if (!query) {
+      res.status(400).json({ error: 'Request does not contains any search word.' });
+    }
+
+    try {
+      const newses = await this.service.search(query, limit, offset);
+      res.status(200).json(newses);
+    } catch (e) {
+      console.error('Error happened during the query.', e);
+      res.status(500).json({ error: e.message });
+    }
+  };
+
 
   findOne = async (req: Request, res: Response): Promise<void> => {
     const id = req.params.id;

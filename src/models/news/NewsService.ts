@@ -31,6 +31,26 @@ export default class NewsService implements NewsRepository {
     }
   };
 
+  search = async (query: string, limit: number, offset: number): Promise<Array<NewsModel>> => {
+    try {
+      return await News.find(
+        {
+          $or: [
+            { 'title': { $regex: query } },
+            { 'body': { $regex: query } },
+            { 'author': { $regex: query } },
+            { 'tags': { $regex: query } }
+          ]
+        }
+      ).sort({ creationDate: -1 })
+        .skip(offset)
+        .limit(limit)
+        .select('-body');
+    } catch (e) {
+      throw new Error(e);
+    }
+  };
+
   findById = async (_id: String): Promise<NewsModel> => {
     try {
       return await News.findById(_id);

@@ -45,4 +45,12 @@ export default interface NewsRepository extends Repository<NewsModel> {
    */
   findByIdIn(ids: Array<String>, limit: number, offset: number): Promise<Array<NewsModel>>;
 
+  /**
+   * Find newses to match given query
+   * @param query - the given searched word
+   * @param limit - the max number of items
+   * @param offset - the start point of pagination
+   */
+  search(query: string, limit: number, offset: number): Promise<Array<NewsModel>>;
+
 }
