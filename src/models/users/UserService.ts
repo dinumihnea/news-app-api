@@ -13,7 +13,6 @@ export default class UserService implements UserRepository {
 
   async checkNews(newsId: String): Promise<boolean> {
     try {
-      // TODO use this when bookmark functionality wll be implemented
       const news = await this.newsService.findById(newsId);
       return !!(news.id);
     } catch (e) {

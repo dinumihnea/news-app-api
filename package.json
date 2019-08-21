@@ -5,12 +5,11 @@
   "main": "build/index.js",
   "scripts": {
     "dev": "npm-run-all --parallel build:watch start:watch",
-    "server": "tsc && nodemon build/index",
     "start": "node build/index",
     "start:watch": "npx nodemon build/index",
     "build": "npx tsc",
     "build:watch": "npx tsc -w",
-    "test": "jest --watch"
+    "test": "npx jest --watch"
   },
   "keywords": [],
   "author": "",
@@ -40,6 +39,7 @@
     "@types/mongoose": "^5.5.9",
     "@types/morgan": "^1.7.36",
     "jest": "^24.8.0",
+    "nodemon": "^1.19.1",
     "ts-jest": "^24.0.2",
     "typescript": "^3.5.3"
   }

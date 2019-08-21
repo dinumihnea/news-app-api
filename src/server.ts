@@ -24,17 +24,6 @@ class Server {
     this.routes();
   }
 
-  // TODO check Env variables before express starts.
-  private static checkEnvVars(): void {
-    const jwtPrivateKey = config.get('jwtPrivateKey');
-    const prefix = config.get('prefix');
-    const version = config.get('version');
-    if (jwtPrivateKey && prefix && version) {
-      console.error('Required environment variables are not defined.');
-      process.exit(1);
-    }
-  }
-
   public config(): void {
     mongoose.connect(MONGO_DB_URL || process.env.MONGODB_URI, { useNewUrlParser: true, useCreateIndex: true })
       .then(() => console.log('Successfully connected to MongoDB.'))

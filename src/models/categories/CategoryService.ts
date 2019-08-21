@@ -18,7 +18,6 @@ export default class CategoryService implements CategoryRepository {
   async findAll(limit: number, offset: number): Promise<Array<CategoryModel>> {
     try {
       // Limit and offset are ignored
-      // TODO Try another solution for models with few data
       return await Category.find();
     } catch (e) {
       throw new Error(e);
