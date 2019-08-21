@@ -1,5 +1,5 @@
 A real world REST full API for a news app built with express framework.
-API has public for read requests and private for data changing request. 
+API has public routes for read requests and private for data changing request. 
 Private routes are secured based on json web token generated when user authenticates.
 
 ## Requirements
