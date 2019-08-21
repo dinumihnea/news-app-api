@@ -5,22 +5,25 @@ import { CollectionRouter } from '../../router/CollectionRouter';
 import { I18n, Language } from '../../i18n/I18n';
 import CategoryService from './CategoryService';
 import ValidationProvider from '../../repositories/ValidationProvider';
+import AuthMiddleware from '../../auth/AuthMiddleware';
 
-class CategoryRouter implements CollectionRouter<CategoryModel>, I18n<CategoryModel>, ValidationProvider<CategoryModel> {
+export default class CategoryRouter implements CollectionRouter<CategoryModel>, I18n<CategoryModel>, ValidationProvider<CategoryModel> {
 
   public router: Router = Router();
   private service: CategoryService = new CategoryService();
+  private auth: AuthMiddleware;
 
-  constructor() {
+  constructor(auth: AuthMiddleware) {
+    this.auth = auth;
     this.routes();
   }
 
   private routes(): void {
     this.router.get('/', this.findAll);
     this.router.get('/:key', this.findOne);
-    this.router.post('/', this.create);
-    this.router.put('/', this.update);
-    this.router.delete('/:key', this.delete);
+    this.router.post('/', [this.auth.requireAuthorization, this.auth.requireAdminRole], this.create);
+    this.router.put('/', [this.auth.requireAuthorization, this.auth.requireAdminRole], this.update);
+    this.router.delete('/:key', [this.auth.requireAuthorization, this.auth.requireAdminRole], this.delete);
   }
 
   create = async (req: Request, res: Response): Promise<void> => {
@@ -58,6 +61,10 @@ class CategoryRouter implements CollectionRouter<CategoryModel>, I18n<CategoryMo
     }
     try {
       const category = await this.service.findOne(key);
+      if (!category) {
+        res.status(400).json({ error: 'Category with given key does not exist.' });
+        return;
+      }
       res.status(200).json(this.translate(category, lang));
     } catch (e) {
       console.error('Error happened during the query', e);
@@ -113,5 +120,3 @@ class CategoryRouter implements CollectionRouter<CategoryModel>, I18n<CategoryMo
     return translatedCategories;
   }
 }
-
-export default new CategoryRouter().router;

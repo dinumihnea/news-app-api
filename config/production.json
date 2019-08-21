@@ -1,5 +1,6 @@
 {
   "name": "News App API",
   "prefix": "api",
-  "version": "v1"
+  "version": "v1",
+  "jwtPrivateKey": "jwtPrivateKey"
 }

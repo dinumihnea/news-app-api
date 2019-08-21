@@ -12,6 +12,8 @@ import CategoryRouter from './models/categories';
 import TagRouter from './models/tags';
 import UserRouter from './models/users';
 import NewsRouter from './models/news';
+import AuthRouter from './auth';
+import AuthMiddleware from './auth/AuthMiddleware';
 
 class Server {
   public app: express.Application;
@@ -23,7 +25,7 @@ class Server {
   }
 
   public config(): void {
-    mongoose.connect(MONGO_DB_URL || process.env.MONGODB_URI, { useNewUrlParser: true })
+    mongoose.connect(MONGO_DB_URL || process.env.MONGODB_URI, { useNewUrlParser: true, useCreateIndex: true })
       .then(() => console.log('Successfully connected to MongoDB.'))
       .catch(error => console.error('Error during MongoDB connection:', error));
 
@@ -47,11 +49,11 @@ class Server {
       res.header('Access-Control-Allow-Origin', ALLOW_ORIGIN);
       res.header(
         'Access-Control-Allow-Methods',
-        'GET, POST, PUT, DELETE, OPTIONS',
+        'GET, POST, PUT, DELETE, OPTIONS'
       );
       res.header(
         'Access-Control-Allow-Headers',
-        'Origin, X-Requested-With, Content-Type, Accept, Authorization, Access-Control-Allow-Credentials',
+        'Origin, X-Requested-With, Content-Type, Accept, Authorization, Access-Control-Allow-Credentials'
       );
       res.header('Access-Control-Allow-Credentials', 'true');
       next();
@@ -60,12 +62,15 @@ class Server {
 
   public routes(): void {
     const router: express.Router = express.Router();
+    const auth = new AuthMiddleware();
 
     this.app.use(`/${config.get('prefix')}/${config.get('version')}/`, router);
-    this.app.use(`/${config.get('prefix')}/${config.get('version')}/news`, NewsRouter);
-    this.app.use(`/${config.get('prefix')}/${config.get('version')}/tags`, TagRouter);
-    this.app.use(`/${config.get('prefix')}/${config.get('version')}/users`, UserRouter);
-    this.app.use(`/${config.get('prefix')}/${config.get('version')}/categories`, CategoryRouter);
+    this.app.use(`/${config.get('prefix')}/${config.get('version')}/news`, new NewsRouter(auth).router);
+    this.app.use(`/${config.get('prefix')}/${config.get('version')}/tags`, new TagRouter(auth).router);
+    this.app.use(`/${config.get('prefix')}/${config.get('version')}/users`, new UserRouter(auth).router);
+    this.app.use(`/${config.get('prefix')}/${config.get('version')}/categories`, new CategoryRouter(auth).router);
+
+    this.app.use(`/${config.get('prefix')}/${config.get('version')}/auth`, AuthRouter);
   }
 }
 

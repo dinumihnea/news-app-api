@@ -4,24 +4,23 @@ import { CollectionRouter } from '../../router/CollectionRouter';
 import * as mongoose from 'mongoose';
 import TagService from './TagService';
 import ValidationProvider from '../../repositories/ValidationProvider';
+import AuthMiddleware from '../../auth/AuthMiddleware';
 
 class TagRouter implements CollectionRouter<TagModel>, ValidationProvider<TagModel> {
 
   public static PAGE_SIZE = 12;
   public router: Router = Router();
   private service: TagService = new TagService;
+  private auth: AuthMiddleware;
 
-  constructor() {
+  constructor(auth: AuthMiddleware) {
+    this.auth = auth;
     this.routes();
   }
 
-  private routes(): void {
-    this.router.get('/', this.findAll);
-    this.router.post('/', this.create);
-    this.router.get('/:id', this.findOne);
-    this.router.delete('/:key', this.delete);
-    this.router.put('/', this.update);
-  }
+  update = async (req: Request, res: Response): Promise<void> => {
+    res.status(403).json({ error: 'The tag can not be updated as entity, use delete and create instead' });
+  };
 
   create = async (req: Request, res: Response): Promise<void> => {
     const key: string = req.body.key;
@@ -41,8 +40,8 @@ class TagRouter implements CollectionRouter<TagModel>, ValidationProvider<TagMod
   };
 
   findAll = async (req: Request, res: Response): Promise<void> => {
-    const offset = req.body.offset ? req.body.limit : 0;
-    const limit = req.body.limit ? req.body.limit : TagRouter.PAGE_SIZE;
+    const offset = req.query.offset ? parseInt(req.query.offset) : 0;
+    const limit = req.query.limit ? parseInt(req.query.limit) : TagRouter.PAGE_SIZE;
 
     try {
       const tags = await this.service.findAll(limit, offset);
@@ -68,6 +67,10 @@ class TagRouter implements CollectionRouter<TagModel>, ValidationProvider<TagMod
       } else {
         // Find by tag key
         const tag = await this.service.findOne(id);
+        if (!tag) {
+          res.status(400).json({ error: 'Tag does not exist' });
+          return;
+        }
         res.status(200).json(tag);
       }
     } catch (e) {
@@ -102,9 +105,13 @@ class TagRouter implements CollectionRouter<TagModel>, ValidationProvider<TagMod
     }
   };
 
-  update = async (req: Request, res: Response): Promise<void> => {
-    res.status(403).json({ error: 'The tag can not be updated as entity, use delete and create instead' })
-  };
+  private routes(): void {
+    this.router.get('/', this.findAll);
+    this.router.post('/', [this.auth.requireAuthorization, this.auth.requireModeratorRole], this.create);
+    this.router.get('/:id', this.findOne);
+    this.router.delete('/:key', [this.auth.requireAuthorization, this.auth.requireModeratorRole], this.delete);
+    this.router.put('/', this.update);
+  }
 
   isValid(model: TagModel): boolean {
     return !!(model && model.key);
@@ -112,4 +119,4 @@ class TagRouter implements CollectionRouter<TagModel>, ValidationProvider<TagMod
 
 }
 
-export default new TagRouter().router;
+export default TagRouter;

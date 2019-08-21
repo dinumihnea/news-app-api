@@ -1,34 +1,61 @@
 import * as mongoose from 'mongoose';
 import { Model, model, Schema } from 'mongoose';
+import * as jwt from 'jsonwebtoken';
+import * as _ from 'lodash';
+import * as config from 'config';
+import { AuthRequest } from '../../auth/AuthMiddleware';
+
+export type UserRoleType = 'simple' | 'moderator' | 'admin';
 
 export interface UserModel extends mongoose.Document {
-  username: String;
   email: String;
+  password?: String,
   firstName?: String;
   lastName?: String;
-  bookmarks?: Array<any>
+  bookmarks?: Array<any>;
   createdAt?: Date;
+  role: UserRoleType;
+
+  /**
+   * Gets an UserModel valued only with the public field which all users can see
+   */
+  getPublicFields(): UserModel;
+
+  /**
+   * Generates an authorization token which contains an user identifier
+   */
+  generateAuthToken(): string;
+
+  /**
+   * Gets the user's name to display
+   */
+  getDisplayName(): string
 }
 
 const UserSchema: Schema = new Schema(
   {
-    username: {
-      type: String,
-      required: true,
-      unique: true
-    },
     email: {
       type: String,
       required: true,
-      unique: true
+      unique: true,
+      minlength: 5,
+      maxlength: 255
+    },
+    password: {
+      type: String,
+      required: true,
+      minlength: 8,
+      maxlength: 255
     },
     firstName: {
       type: String,
-      required: false
+      required: false,
+      maxlength: 255
     },
     lastName: {
       type: String,
-      required: false
+      required: false,
+      maxlength: 255
     },
     bookmarks: {
       type: Array,
@@ -37,11 +64,31 @@ const UserSchema: Schema = new Schema(
     createdAt: {
       type: Date,
       default: Date.now
+    },
+    role: {
+      type: String,
+      required: true,
+      default: 'simple'
     }
   },
   {
     versionKey: false
   }
 );
+
+UserSchema.methods.generateAuthToken = function (): string {
+  return jwt.sign({ _id: this._id, role: this.role }, config.get('jwtPrivateKey'));
+};
+
+UserSchema.methods.getPublicFields = function (): AuthRequest {
+  return _.pick(this, ['_id', 'email', 'firstName', 'lastName']);
+};
+
+UserSchema.methods.getDisplayName = function (): string {
+  const fullName = `${this.firstName ? this.firstName : ''}  ${this.lastName ? this.lastName : ''}`
+    .trim().replace(/\s\s+/g, ' ');
+  return fullName ? fullName : this.email;
+};
+
 
 export const User: Model<UserModel> = model('User', UserSchema);

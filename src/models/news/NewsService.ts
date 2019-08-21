@@ -31,6 +31,26 @@ export default class NewsService implements NewsRepository {
     }
   };
 
+  search = async (query: string, limit: number, offset: number): Promise<Array<NewsModel>> => {
+    try {
+      return await News.find(
+        {
+          $or: [
+            { 'title': { $regex: query } },
+            { 'body': { $regex: query } },
+            { 'author': { $regex: query } },
+            { 'tags': { $regex: query } }
+          ]
+        }
+      ).sort({ creationDate: -1 })
+        .skip(offset)
+        .limit(limit)
+        .select('-body');
+    } catch (e) {
+      throw new Error(e);
+    }
+  };
+
   findById = async (_id: String): Promise<NewsModel> => {
     try {
       return await News.findById(_id);
@@ -56,7 +76,7 @@ export default class NewsService implements NewsRepository {
   save = async (draftNews: NewsModel): Promise<NewsModel> => {
     const category = await this.categoryService.findOne(draftNews.category.key);
     if (!category) {
-      throw new Error('The given news category does not exists');
+      throw new Error('The given news category does not exist');
     } else {
       draftNews.category = category;
     }
@@ -72,10 +92,8 @@ export default class NewsService implements NewsRepository {
 
   update = async (model: NewsModel): Promise<any> => {
     let news = await this.findById(model._id);
-    console.log('Old news', news);
-    console.log('New news', model);
     if (!news) {
-      throw new Error('News with given identifiers does not exists');
+      throw new Error('News with given identifiers does not exist');
     }
 
     try {
@@ -91,7 +109,8 @@ export default class NewsService implements NewsRepository {
         .find({ tags: { $in: key } })
         .sort({ creationDate: -1 })
         .skip(offset)
-        .limit(limit);
+        .limit(limit)
+        .select('-body');
     } catch (e) {
       throw new Error(e);
     }
@@ -106,14 +125,16 @@ export default class NewsService implements NewsRepository {
           .find({ 'category._id': key })
           .sort({ creationDate: -1 })
           .skip(offset)
-          .limit(limit);
+          .limit(limit)
+          .select('-body');
       } else {
         // Search by category.key match
         return await News
           .find({ 'category.key': key })
           .sort({ creationDate: -1 })
           .skip(offset)
-          .limit(limit);
+          .limit(limit)
+          .select('-body');
       }
     } catch (e) {
       throw new Error(e);
@@ -150,6 +171,19 @@ export default class NewsService implements NewsRepository {
   findBySlug = async (slug: String): Promise<NewsModel> => {
     try {
       return await News.findOne({ slug });
+    } catch (e) {
+      throw new Error(e);
+    }
+  };
+
+  findByIdIn = async (ids: Array<String>, limit: number, offset: number): Promise<Array<NewsModel>> => {
+    try {
+      return await News.find({
+        _id: {
+          $in: ids
+        }
+      }).skip(offset)
+        .limit(limit).select('-body');
     } catch (e) {
       throw new Error(e);
     }

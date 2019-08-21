@@ -18,7 +18,6 @@ export default class CategoryService implements CategoryRepository {
   async findAll(limit: number, offset: number): Promise<Array<CategoryModel>> {
     try {
       // Limit and offset are ignored
-      // TODO Try another solution for models with few data
       return await Category.find();
     } catch (e) {
       throw new Error(e);
@@ -44,7 +43,7 @@ export default class CategoryService implements CategoryRepository {
   async update(model: CategoryModel): Promise<any> {
     let category = await this.findOne(model.key);
     if (!category) {
-      throw new Error('Category with given key does not exists');
+      throw new Error('Category with given key does not exist');
     }
     try {
       return await category.updateOne({
