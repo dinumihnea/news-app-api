@@ -58,11 +58,11 @@ This token must be provided as header with key `x-auth-token` for routes which r
 * `DELETE /me/bookmarks` requires authorization: removes given news id from bookmarks of current user
 
 ##### News
-* `GET /news/search` returns a list of newses which match given `q` query param 
-* `GET /news` returns a list of newses sorted by `creationDate` 
+* `GET /news/search` returns a list of news which match given `q` query param 
+* `GET /news` returns a list of news sorted by `creationDate` 
 * `GET /news:/id` returns details about the news with given `id`
-* `GET /tags/:tag` gives a list of newses which match given tag
-* `GET /categories/:category` gives a list of newses with given category
+* `GET /tags/:tag` gives a list of news which match given tag
+* `GET /categories/:category` gives a list of news with given category
 * `POST /news` requires moderator or admin role: saves the given news
 * `PUT /news` requires moderator or admin role: updates the given news
 * `DELETE /news/:id` requires moderator or admin role: removes news from database by given `id`

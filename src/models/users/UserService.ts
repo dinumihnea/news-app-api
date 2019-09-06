@@ -100,8 +100,8 @@ export default class UserService implements UserRepository {
     }
 
     try {
-      const newsesId = user.bookmarks.reverse();
-      return await this.newsService.findByIdIn(newsesId, limit, offset);
+      const newsId = user.bookmarks.reverse();
+      return await this.newsService.findByIdIn(newsId, limit, offset);
     } catch (e) {
       throw new Error(e);
     }

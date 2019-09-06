@@ -62,8 +62,8 @@ export default class NewsRouter implements CollectionRouter<NewsModel>, Validati
     }
 
     try {
-      const newses = await this.service.findByCategory(categoryKey, limit, offset);
-      res.status(200).json(newses);
+      const news = await this.service.findByCategory(categoryKey, limit, offset);
+      res.status(200).json(news);
     } catch (e) {
       console.error('Error happened during the query.', e);
       res.status(500).json({ error: e.message });
@@ -81,8 +81,8 @@ export default class NewsRouter implements CollectionRouter<NewsModel>, Validati
     }
 
     try {
-      const newses = await this.service.findByTag(tagKey, limit, offset);
-      res.status(200).json(newses);
+      const news = await this.service.findByTag(tagKey, limit, offset);
+      res.status(200).json(news);
     } catch (e) {
       console.error('Error happened during the query.', e);
       res.status(500).json({ error: e.message });
@@ -111,8 +111,8 @@ export default class NewsRouter implements CollectionRouter<NewsModel>, Validati
     // const lang = req.headers['content-language'];
 
     try {
-      const newses = await this.service.findAll(limit, offset);
-      res.status(200).json(newses);
+      const news = await this.service.findAll(limit, offset);
+      res.status(200).json(news);
     } catch (e) {
       console.error('Error happened during the query.', e);
       res.status(500).json({ error: e.message });
@@ -129,8 +129,8 @@ export default class NewsRouter implements CollectionRouter<NewsModel>, Validati
     }
 
     try {
-      const newses = await this.service.search(query, limit, offset);
-      res.status(200).json(newses);
+      const news = await this.service.search(query, limit, offset);
+      res.status(200).json(news);
     } catch (e) {
       console.error('Error happened during the query.', e);
       res.status(500).json({ error: e.message });

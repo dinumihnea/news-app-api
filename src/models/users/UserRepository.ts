@@ -17,7 +17,7 @@ export default interface UserRepository extends Repository<UserModel> {
   findOneIncludePassword(id: String): Promise<UserModel>
 
   /**
-   * Finds the list of bookmarked newses for given user id
+   * Finds the list of bookmarked news for given user id
    * @param id - the user id
    * @param limit - the max number of items
    * @param offset - the start point of pagination

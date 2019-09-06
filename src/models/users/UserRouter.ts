@@ -33,8 +33,8 @@ export default class UserRouter implements CollectionRouter<UserModel>, Validati
     }
 
     try {
-      const newses = await this.service.findBookmarks(id, limit, offset);
-      res.status(200).json(newses);
+      const news = await this.service.findBookmarks(id, limit, offset);
+      res.status(200).json(news);
     } catch (e) {
       console.error('Error happened during the query.', e);
       res.status(500).json({ error: e.message });
